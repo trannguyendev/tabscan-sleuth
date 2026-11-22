@@ -13,7 +13,7 @@ Chromium-based browsers (Google Chrome, Microsoft Edge, Brave, Opera) check for 
 1. **Update Manifest Registration**:
    `manifest.json` specifies the remote update endpoint:
    ```json
-   "update_url": "https://raw.githubusercontent.com/username/tabscan-qa/main/dist/updates.xml"
+   "update_url": "https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
    ```
 
 2. **Polling Mechanism**:
@@ -32,7 +32,7 @@ Chromium-based browsers (Google Chrome, Microsoft Edge, Brave, Opera) check for 
    <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
      <app appid='jjoepgfpagdecpcbabppbbnblaeklpic'>
        <updatecheck
-         codebase='https://raw.githubusercontent.com/username/tabscan-qa/main/dist/tab-scan-qa.crx'
+         codebase='https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/tab-scan-qa.crx'
          version='1.0.1'
          prodversionmin='116.0.0.0' />
      </app>
@@ -60,7 +60,7 @@ To ensure the extension App ID remains **100% stable** across developer unpacked
   "name": "TabScan Q&A",
   "version": "1.0.0",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...",
-  "update_url": "https://raw.githubusercontent.com/username/tabscan-qa/main/dist/updates.xml"
+  "update_url": "https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
 }
 ```
 
@@ -112,8 +112,8 @@ node scripts/package-release.mjs
 |---|---|---|
 | `--key=<path>` | Path to RSA 2048 private key PEM | `key.pem` (auto-generated if missing) |
 | `--out=<dir>` | Output directory for release artifacts | `dist/` |
-| `--update-url=<url>` | URL to remote `updates.xml` | `https://raw.githubusercontent.com/username/tabscan-qa/main/dist/updates.xml` |
-| `--codebase-url=<url>` | Download URL to remote `.crx` file | `https://raw.githubusercontent.com/username/tabscan-qa/main/dist/tab-scan-qa.crx` |
+| `--update-url=<url>` | URL to remote `updates.xml` | `https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml` |
+| `--codebase-url=<url>` | Download URL to remote `.crx` file | `https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/tab-scan-qa.crx` |
 | `--version=<ver>` | Version string override | Reads `"version"` from `manifest.json` |
 | `-h, --help` | Display usage instructions | — |
 
@@ -226,7 +226,7 @@ Open PowerShell as Administrator:
 
 ```powershell
 $AppId = "jjoepgfpagdecpcbabppbbnblaeklpic"
-$UpdateUrl = "https://raw.githubusercontent.com/username/tabscan-qa/main/dist/updates.xml"
+$UpdateUrl = "https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
 $RegPath = "HKLM:\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist"
 
 if (!(Test-Path $RegPath)) {
@@ -260,7 +260,7 @@ Create or update `/Library/Managed Preferences/com.google.Chrome.plist`:
 <dict>
   <key>ExtensionInstallForcelist</key>
   <array>
-    <string>jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/username/tabscan-qa/main/dist/updates.xml</string>
+    <string>jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml</string>
   </array>
 </dict>
 </plist>
@@ -278,7 +278,7 @@ Create `/etc/opt/chrome/policies/managed/tabscan.json`:
 ```json
 {
   "ExtensionInstallForcelist": [
-    "jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/username/tabscan-qa/main/dist/updates.xml"
+    "jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
   ]
 }
 ```
@@ -317,7 +317,7 @@ GitHub Pages and GitHub Releases provide reliable, high-availability, zero-cost 
    - Tag the release: `git tag v1.0.1 && git push origin v1.0.1`
    - Create a GitHub Release and upload `dist/tab-scan-qa.crx`.
    - Update `updates.xml` codebase URL to point to the GitHub Release download URL:
-     `https://github.com/username/tabscan-qa/releases/download/v1.0.1/tab-scan-qa.crx`
+     `https://github.com/trannguyendev/tabscan-qa/releases/download/v1.0.1/tab-scan-qa.crx`
 
 ---
 

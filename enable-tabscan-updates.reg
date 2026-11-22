@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+; ==============================================================================
+; TabScan Q&A - Windows Chrome CRX Allowlist & Auto-Update Policy
+; App ID: jjoepgfpagdecpcbabppbbnblaeklpic
+;
+; This allows installing tab-scan-qa.crx without paying the Chrome Web Store $5 fee,
+; and enables automatic silent background updates from GitHub.
+; ==============================================================================
+
+[HKEY_CURRENT_USER\Software\Policies\Google\Chrome\ExtensionInstallAllowlist]
+"1"="jjoepgfpagdecpcbabppbbnblaeklpic"

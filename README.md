@@ -216,12 +216,24 @@ TabScan Q&A does not merely answer questions; it can interact with the page to s
 6. Click the extension puzzle piece icon in the browser toolbar and pin **TabScan Q&A**.
 7. Click the **TabScan Q&A** toolbar icon to open the Side Panel.
 
-### Option B: Install Packaged CRX3 File
+### Option B: Install Packaged CRX3 File (With Automatic Updates)
 
-1. Locate the signed CRX3 package at `dist/tab-scan-qa.crx` (or download it from your hosted releases).
-2. Navigate to `chrome://extensions` and ensure **Developer mode** is enabled.
-3. Drag and drop `tab-scan-qa.crx` directly onto the `chrome://extensions` tab.
-4. When prompted with *"Add TabScan Q&A?"*, click **Add extension**.
+> [!IMPORTANT]
+> **Windows Chrome Users (Free Web Store Bypass & Silent Auto-Updates)**:  
+> Google Chrome restricts third-party `.crx` files unless they are published to the Chrome Web Store ($5 fee) or whitelisted in Chrome's enterprise policy. To install the `.crx` and enable **automatic silent background updates** from GitHub for free:
+> 
+> 1. Run the one-time allowlist setup:
+>    - Double-click [`enable-tabscan-updates.bat`](enable-tabscan-updates.bat) (or merge [`enable-tabscan-updates.reg`](enable-tabscan-updates.reg))
+>    - *Or run this single PowerShell command:*
+>      ```powershell
+>      reg add "HKCU\Software\Policies\Google\Chrome\ExtensionInstallAllowlist" /v 1 /t REG_SZ /d "jjoepgfpagdecpcbabppbbnblaeklpic" /f
+>      ```
+> 2. Open Google Chrome (or Brave / Edge) and go to `chrome://extensions`.
+> 3. In the top-right corner, toggle **Developer mode** to **ON**.
+> 4. Drag and drop `tab-scan-qa.crx` (from the latest release or `dist/`) directly onto the `chrome://extensions` tab.
+> 5. When prompted with *"Add TabScan Q&A?"*, click **Add extension**.
+> 
+> ✨ **Auto-Update Enabled**: Once installed, Chrome will automatically poll `dist/updates.xml` on GitHub and silently update TabScan Q&A in the background whenever you publish a new version. No manual updates needed!
 
 ### Configuration & API Keys
 
