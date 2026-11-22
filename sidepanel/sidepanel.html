@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>TabScan Q&amp;A</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="panel-header">
+      <div class="header-top">
+        <div class="brand">
+          <svg class="brand-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="10.5" cy="10.5" r="2" fill="currentColor"/>
+          </svg>
+          <h1>TabScan Q&amp;A</h1>
+        </div>
+
+        <div class="header-actions">
+          <button
+            type="button"
+            id="auto-scan-toggle"
+            class="btn-pill"
+            aria-pressed="true"
+            aria-label="Toggle auto-scan"
+            title="Toggle automatic scanning on tab switch and navigation"
+          >
+            <span class="pill-dot" aria-hidden="true"></span>
+            <span id="auto-scan-label">Auto-scan: On</span>
+          </button>
+
+          <button
+            type="button"
+            id="screen-scan-toggle"
+            class="btn-pill"
+            aria-pressed="true"
+            aria-label="Toggle screen scanning"
+            title="Capture full scrollable page &amp; embedded images alongside DOM text"
+          >
+            <svg class="pill-icon-svg" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <path fill="currentColor" d="M5.5 2.5l-.8 1.5H3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.7l-.8-1.5h-4zM8 12a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm0-1.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+            </svg>
+            <span id="screen-scan-label">Screen: On</span>
+          </button>
+
+          <button
+            type="button"
+            id="rescan-btn"
+            class="btn-icon"
+            aria-label="Rescan active tab"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/>
+            </svg>
+            <span>Rescan</span>
+          </button>
+
+          <button
+            type="button"
+            id="settings-btn"
+            class="btn-icon"
+            aria-label="Open settings"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.84 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="tab-card">
+        <div class="tab-meta">
+          <img id="tab-favicon" class="tab-favicon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="16" height="16" hidden>
+          <div class="tab-titles">
+            <div id="tab-title" class="tab-title">Tab Sleuth ready to investigate…</div>
+            <div id="tab-host" class="tab-host"></div>
+          </div>
+          <span id="scan-status" class="status-badge" data-state="idle">
+            <span id="scan-status-icon" aria-hidden="true">○</span>
+            <span id="scan-status-text">Idle</span>
+          </span>
+        </div>
+
+        <details id="preview-details" class="preview-details" hidden>
+          <summary>Inspected Page Blueprint &amp; Clues</summary>
+          <div class="preview-body">
+            <div id="preview-stats" class="preview-stats"></div>
+            <img id="preview-screenshot" class="preview-screenshot" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Captured active tab viewport" hidden>
+            <div id="preview-screenshot-strip" class="preview-screenshot-strip" hidden></div>
+            <pre id="preview-text" class="preview-text" role="region" aria-label="Extracted page text preview" tabindex="0"></pre>
+          </div>
+        </details>
+      </div>
+    </header>
+
+    <main id="main-content" class="panel-main">
+      <section id="setup-banner" class="callout callout-info" aria-label="API Key Setup" hidden>
+        <div class="callout-content">
+          <svg class="callout-icon-svg" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+            <circle cx="7" cy="8" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/>
+            <circle cx="7" cy="8" r="1.5" fill="currentColor"/>
+            <path d="M11 9.5l6 6v2.5h-2.5v-1.5h-2v-2l-2.5-2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <p class="callout-title">Hand your Sleuth an API Key</p>
+            <p class="callout-text">Your active tab is indexed and ready. Connect your Gemini or Claude API key in Settings to solve page questions and chat freely.</p>
+          </div>
+        </div>
+        <button type="button" id="open-setup-btn" class="btn-primary">Add API Key</button>
+      </section>
+
+      <section id="selection-banner" class="callout callout-selection" aria-label="Selected Text" hidden>
+        <div class="callout-content">
+          <svg class="callout-icon-svg" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+            <circle cx="5.5" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="5.5" cy="14" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M7.5 7.5L16 15M7.5 12.5L16 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div class="selection-copy">
+            <p class="callout-title">Snagged highlighted passage</p>
+            <p id="selection-snippet" class="selection-snippet"></p>
+          </div>
+        </div>
+        <button type="button" id="ask-selection-btn" class="btn-secondary">Solve Highlight</button>
+      </section>
+
+      <section class="panel-section" aria-labelledby="detected-heading">
+        <div class="section-header">
+          <h2 id="detected-heading">Discovered Questions &amp; Clues</h2>
+          <button type="button" id="analyze-btn" class="btn-ghost btn-sm" hidden>Analyze</button>
+        </div>
+
+        <div
+          id="page-actions-toolbar"
+          class="actions-toolbar"
+          role="toolbar"
+          focusgroup="toolbar wrap"
+          aria-label="Page answer actions"
+          aria-controls="analysis-output"
+          hidden
+        >
+          <div role="group" aria-label="Highlight and apply" class="toolbar-group">
+            <button type="button" id="highlight-all-btn" class="btn-secondary btn-sm">Highlight All</button>
+            <button type="button" id="apply-all-btn" class="btn-primary btn-sm">Apply All</button>
+          </div>
+          <span role="separator" aria-orientation="vertical" class="toolbar-separator"></span>
+          <div role="group" aria-label="Reset" class="toolbar-group">
+            <button type="button" id="clear-highlights-btn" class="btn-ghost btn-sm">Clear</button>
+          </div>
+        </div>
+        <p id="page-action-status" class="action-status" role="status"></p>
+
+        <div id="analysis-progress" class="progress-row" hidden>
+          <label for="analysis-progressbar" class="progress-label" id="analysis-progress-label">Analyzing active tab with Gemini…</label>
+          <progress id="analysis-progressbar"></progress>
+        </div>
+
+        <div id="analysis-error" class="callout callout-error" role="alert" hidden>
+          <div class="callout-content">
+            <svg class="callout-icon-svg" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+              <path d="M10 2.5L1.5 17h17L10 2.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <line x1="10" y1="7.5" x2="10" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="10" cy="14.5" r="1" fill="currentColor"/>
+            </svg>
+            <p id="analysis-error-text" class="callout-text"></p>
+          </div>
+          <div class="callout-actions">
+            <button type="button" id="retry-analysis-btn" class="btn-secondary btn-sm">Retry</button>
+            <button type="button" id="error-settings-btn" class="btn-ghost btn-sm">Settings</button>
+          </div>
+        </div>
+
+        <div id="analysis-output" class="analysis-output">
+          <div class="empty-state-card">
+            <svg class="empty-illustration" viewBox="0 0 64 64" width="48" height="48" aria-hidden="true">
+              <rect x="14" y="10" width="36" height="44" rx="6" fill="var(--bg-subtle)" stroke="var(--border-strong)" stroke-width="2"/>
+              <path d="M22 20h20M22 28h20M22 36h12" stroke="var(--border-strong)" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="42" cy="42" r="10" fill="var(--bg-surface)" stroke="var(--brand)" stroke-width="2.5"/>
+              <line x1="49" y1="49" x2="56" y2="56" stroke="var(--brand)" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="42" cy="42" r="3" fill="var(--brand)"/>
+            </svg>
+            <p class="empty-title">Ready to investigate!</p>
+            <p class="muted-placeholder">Open or switch to any webpage to scan it automatically.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-section chat-section" aria-labelledby="chat-heading">
+        <div class="section-header">
+          <h2 id="chat-heading">Chat with This Page</h2>
+          <button type="button" id="clear-chat-btn" class="btn-ghost btn-sm" hidden>Clear</button>
+        </div>
+
+        <div id="quick-chips" class="quick-chips" aria-label="Suggested prompt questions">
+          <button type="button" class="chip-btn" data-prompt="Summarize this page">⚡ Summarize page</button>
+          <button type="button" class="chip-btn" data-prompt="What are the key takeaways?">🔍 Key takeaways</button>
+          <button type="button" class="chip-btn" data-prompt="Explain the main concepts">💡 Explain concepts</button>
+          <button type="button" class="chip-btn" data-prompt="Find action items and next steps">🎯 Action items</button>
+        </div>
+
+        <div id="chat-thread" class="chat-thread" aria-label="Question and answer history"></div>
+      </section>
+    </main>
+
+    <footer class="composer-footer">
+      <form id="qa-form" class="qa-form" novalidate>
+        <label for="question-input" class="visually-hidden">Ask a question about the active tab</label>
+        <textarea
+          id="question-input"
+          name="question"
+          rows="2"
+          placeholder="What shall we uncover on this page? (Enter to send, Shift+Enter for new line)"
+          required
+        ></textarea>
+        <div class="composer-actions">
+          <span id="model-pill" class="model-pill">gemini-3.8-flash</span>
+          <div class="composer-buttons">
+            <button type="button" id="stop-btn" class="btn-danger btn-sm" hidden>Stop</button>
+            <button type="submit" id="send-btn" class="btn-primary">Ask</button>
+          </div>
+        </div>
+      </form>
+    </footer>
+  </div>
+
+  <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title" closedby="any">
+    <div class="dialog-header">
+      <h1 id="settings-title">Settings</h1>
+      <button type="button" id="close-settings-btn" class="btn-icon" aria-label="Close settings">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 3l10 10M13 3L3 13"/>
+        </svg>
+      </button>
+    </div>
+
+    <form id="settings-form" class="settings-form" novalidate>
+      <div class="field">
+        <label id="provider-label" class="section-label">AI Provider</label>
+        <span id="provider-hint" class="field-hint">Pick your reasoning engine, then enter its API key below.</span>
+        <div
+          id="provider-segmented-control"
+          class="provider-segmented-control"
+          role="radiogroup"
+          aria-labelledby="provider-label"
+        >
+          <button
+            type="button"
+            id="provider-btn-gemini"
+            class="provider-chip active"
+            data-provider="gemini"
+            role="radio"
+            aria-checked="true"
+          >
+            <svg class="provider-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path fill="currentColor" d="M12 2L3 9l9 13 9-13-9-7zm0 3.2L17.5 9 12 17.5 6.5 9 12 5.2z"/>
+            </svg>
+            <span class="provider-name">Google Gemini</span>
+          </button>
+          <button
+            type="button"
+            id="provider-btn-claude"
+            class="provider-chip"
+            data-provider="claude"
+            role="radio"
+            aria-checked="false"
+          >
+            <svg class="provider-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path fill="currentColor" d="M12 2a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-3 0v-3A1.5 1.5 0 0 1 12 2zm0 14a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-3 0v-3A1.5 1.5 0 0 1 12 16zm10-5.5a1.5 1.5 0 0 1-1.5 1.5h-3a1.5 1.5 0 0 1 0-3h3a1.5 1.5 0 0 1 1.5 1.5zM6.5 12a1.5 1.5 0 0 1-1.5 1.5h-3a1.5 1.5 0 0 1 0-3h3A1.5 1.5 0 0 1 6.5 12zm12.57-6.07a1.5 1.5 0 0 1 0 2.12l-2.12 2.12a1.5 1.5 0 1 1-2.12-2.12l2.12-2.12a1.5 1.5 0 0 1 2.12 0zM9.17 14.83a1.5 1.5 0 0 1 0 2.12l-2.12 2.12a1.5 1.5 0 0 1-2.12-2.12l2.12-2.12a1.5 1.5 0 0 1 2.12 0zm0-7.78a1.5 1.5 0 0 1-2.12 0L4.93 4.93a1.5 1.5 0 0 1 2.12-2.12l2.12 2.12a1.5 1.5 0 0 1 0 2.12zm10.7 10.7a1.5 1.5 0 0 1-2.12 0l-2.12-2.12a1.5 1.5 0 1 1 2.12-2.12l2.12 2.12a1.5 1.5 0 0 1 0 2.12z"/>
+            </svg>
+            <span class="provider-name">Anthropic Claude</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="api-key-input" id="api-key-label">Gemini API Key <span aria-hidden="true">*</span></label>
+          <a
+            id="get-key-link"
+            href="https://aistudio.google.com/app/apikey"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-subtle"
+          >Get key ↗</a>
+        </div>
+        <span id="api-key-hint" class="field-hint">
+          Stored locally and securely in Chrome extension storage.
+        </span>
+        <div class="input-with-action">
+          <input
+            type="password"
+            id="api-key-input"
+            name="apiKey"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            required
+            minlength="8"
+            placeholder="Enter API key…"
+            aria-describedby="api-key-hint"
+            data-error="api-key-error"
+          >
+          <button
+            type="button"
+            id="toggle-key-btn"
+            class="btn-ghost btn-sm"
+            aria-pressed="false"
+            aria-label="Show API key"
+          >Show</button>
+        </div>
+        <div id="api-key-error" class="error-msg">
+          <svg class="error-icon-svg" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <line x1="8" y1="4.5" x2="8" y2="8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="8" cy="11.5" r="1" fill="currentColor"/>
+          </svg>
+          Enter a valid API key.
+        </div>
+
+        <div class="key-test-row">
+          <button type="button" id="fetch-models-btn" class="btn-secondary btn-sm">
+            <svg class="btn-icon-svg" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <path fill="currentColor" d="M8 2.5a5.5 5.5 0 1 0 5.4 6.5h-1.55a4 4 0 1 1-.95-4.2L9.5 6.2H14V1.7L12.3 3.4A5.47 5.47 0 0 0 8 2.5Z"/>
+            </svg>
+            <span id="fetch-models-btn-text">Fetch Models</span>
+          </button>
+          <button type="button" id="test-key-btn" class="btn-ghost btn-sm" hidden>Test Connection</button>
+          <span id="fetch-models-status" class="test-key-status" aria-live="polite"></span>
+          <span id="test-key-status" class="visually-hidden" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="model-select">Active Model</label>
+          <span id="models-count-badge" class="badge badge-subtle" hidden></span>
+        </div>
+        <span id="model-hint" class="field-hint">
+          Pick a model loaded from your key, or choose a recommended default.
+        </span>
+        <select id="model-select" name="model" aria-describedby="model-hint">
+          <option value="gemini-3.8-flash">Gemini 3.8 Flash (Recommended)</option>
+          <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (Fastest / low cost)</option>
+          <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite (Lightweight)</option>
+          <option value="gemini-4-argon">Gemini 4 Argon (Deep reasoning)</option>
+          <option value="custom">Custom model ID…</option>
+        </select>
+      </div>
+
+      <div id="custom-model-field" class="field" hidden>
+        <label for="custom-model-input">Custom Model ID</label>
+        <span id="custom-model-hint" class="field-hint">Enter an exact Gemini model endpoint code, e.g. gemini-3.6-flash.</span>
+        <input
+          type="text"
+          id="custom-model-input"
+          name="customModel"
+          autocorrect="off"
+          autocapitalize="none"
+          spellcheck="false"
+          aria-describedby="custom-model-hint"
+          data-error="custom-model-error"
+        >
+        <div id="custom-model-error" class="error-msg">
+          <svg class="error-icon-svg" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <line x1="8" y1="4.5" x2="8" y2="8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="8" cy="11.5" r="1" fill="currentColor"/>
+          </svg>
+          Enter a valid model ID when Custom is selected.
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="thinking-select">Reasoning Depth</label>
+        <span id="thinking-hint" class="field-hint">
+          Low responds quickly; Medium or High improves accuracy on tricky coding, math, or quiz items.
+        </span>
+        <select id="thinking-select" name="thinkingLevel" aria-describedby="thinking-hint">
+          <option value="low">Low (Fastest)</option>
+          <option value="medium">Medium (Balanced)</option>
+          <option value="high">High (Thorough)</option>
+          <option value="auto">Model Default</option>
+        </select>
+      </div>
+
+      <fieldset class="field-group">
+        <legend>Answer Style</legend>
+        <div class="radio-row">
+          <input type="radio" id="style-concise" name="answerStyle" value="concise" checked>
+          <label for="style-concise">Concise (direct answer + brief reason)</label>
+        </div>
+        <div class="radio-row">
+          <input type="radio" id="style-detailed" name="answerStyle" value="detailed">
+          <label for="style-detailed">Detailed (step-by-step explanation)</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>Automation</legend>
+        <div class="check-row">
+          <input type="checkbox" id="auto-scan-checkbox" name="autoScan" checked>
+          <label for="auto-scan-checkbox">Automatically scan active tab on switch or page load</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="scan-screen-checkbox" name="scanScreen" checked>
+          <label for="scan-screen-checkbox">Capture screen &amp; page images (reads image passages, diagrams &amp; PDFs)</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="full-page-scan-checkbox" name="fullPageScan" checked>
+          <label for="full-page-scan-checkbox">Capture entire scrollable page when long content spans multiple screens</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="auto-answer-checkbox" name="autoAnswer" checked>
+          <label for="auto-answer-checkbox">Automatically detect and answer page questions after scanning</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="auto-highlight-checkbox" name="autoHighlight" checked>
+          <label for="auto-highlight-checkbox">Automatically highlight answers on the active page</label>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="auto-apply-checkbox" name="autoApply">
+          <label for="auto-apply-checkbox">Automatically apply answers into matching quiz or form inputs</label>
+        </div>
+      </fieldset>
+
+      <div class="dialog-footer">
+        <button type="button" id="cancel-settings-btn" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Save Settings</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="sr-announcer" class="visually-hidden" aria-live="polite"></div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

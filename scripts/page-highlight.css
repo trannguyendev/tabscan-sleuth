@@ -1,0 +1,94 @@
+/* Injected via chrome.scripting.insertCSS for highlighting detected answers on active pages */
+
+::highlight(tabscan-answer) {
+  background-color: #fef08a;
+  color: #0f172a;
+  text-decoration-line: underline;
+  text-decoration-color: #15803d;
+  text-decoration-thickness: 2px;
+}
+
+.tabscan-ext-mark {
+  background-color: #fef08a !important;
+  color: #0f172a !important;
+  padding: 0 2px !important;
+  border-radius: 3px !important;
+  text-decoration: underline 2px #15803d !important;
+  font-weight: inherit !important;
+}
+
+.tabscan-ext-answer-highlight {
+  outline: 2.5px solid #16a34a !important;
+  outline-offset: 2px !important;
+  background-color: rgba(22, 163, 74, 0.14) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.14) !important;
+}
+
+.tabscan-ext-answer-applied {
+  outline: 2.5px solid #2563eb !important;
+  outline-offset: 2px !important;
+  background-color: rgba(37, 99, 235, 0.12) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16) !important;
+}
+
+.tabscan-ext-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin-inline-start: 8px !important;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid #15803d !important;
+  background-color: #dcfce7 !important;
+  color: #14532d !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  vertical-align: middle !important;
+  letter-spacing: 0.01em !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.tabscan-ext-badge[data-variant='applied'] {
+  border-color: #1d4ed8 !important;
+  background-color: #dbeafe !important;
+  color: #1e3a8a !important;
+}
+
+/* Color-coded matching pair outlines & badges (paired with M1/M2/... labels so color is never sole indicator) */
+.tabscan-ext-pair-0 { outline-color: #4f46e5 !important; background-color: rgba(79, 70, 229, 0.11) !important; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.16) !important; }
+.tabscan-ext-pair-1 { outline-color: #0d9488 !important; background-color: rgba(13, 148, 136, 0.11) !important; box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.16) !important; }
+.tabscan-ext-pair-2 { outline-color: #d97706 !important; background-color: rgba(217, 119, 6, 0.12) !important; box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.16) !important; }
+.tabscan-ext-pair-3 { outline-color: #e11d48 !important; background-color: rgba(225, 29, 72, 0.1) !important; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.16) !important; }
+.tabscan-ext-pair-4 { outline-color: #9333ea !important; background-color: rgba(147, 51, 234, 0.1) !important; box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.16) !important; }
+.tabscan-ext-pair-5 { outline-color: #0284c7 !important; background-color: rgba(2, 132, 199, 0.11) !important; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.16) !important; }
+
+.tabscan-ext-badge[data-pair-slot='0'] { border-color: #4f46e5 !important; background-color: #e0e7ff !important; color: #312e81 !important; }
+.tabscan-ext-badge[data-pair-slot='1'] { border-color: #0d9488 !important; background-color: #ccfbf1 !important; color: #134e4a !important; }
+.tabscan-ext-badge[data-pair-slot='2'] { border-color: #d97706 !important; background-color: #fef3c7 !important; color: #78350f !important; }
+.tabscan-ext-badge[data-pair-slot='3'] { border-color: #e11d48 !important; background-color: #ffe4e6 !important; color: #881337 !important; }
+.tabscan-ext-badge[data-pair-slot='4'] { border-color: #9333ea !important; background-color: #f3e8ff !important; color: #581c87 !important; }
+.tabscan-ext-badge[data-pair-slot='5'] { border-color: #0284c7 !important; background-color: #e0f2fe !important; color: #0c4a6e !important; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tabscan-ext-answer-highlight,
+  .tabscan-ext-answer-applied {
+    transition: outline-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .tabscan-ext-answer-highlight,
+  .tabscan-ext-answer-applied {
+    outline: 3px solid Highlight !important;
+  }
+  .tabscan-ext-badge {
+    border: 2px solid Highlight !important;
+    background-color: Canvas !important;
+    color: CanvasText !important;
+  }
+}

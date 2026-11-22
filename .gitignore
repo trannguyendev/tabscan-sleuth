@@ -1,0 +1,24 @@
+# Private RSA key — NEVER commit this
+key.pem
+*.pem
+*.p12
+*.pfx
+
+# Build output — CRX and ZIP releases are uploaded to GitHub Releases assets
+dist/*
+!dist/updates.xml
+
+# Node.js
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor temp files
+.vscode/
+*.swp
+*.swo
