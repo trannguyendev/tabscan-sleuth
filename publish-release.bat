@@ -65,27 +65,33 @@ echo Publishing %TAG% to GitHub Releases with all assets...
   "dist/tab-scan-qa.zip#tab-scan-qa.zip" ^
   "enable-tabscan-updates.bat#enable-tabscan-updates.bat" ^
   --repo trannguyendev/tabscan-sleuth ^
-  --title "%TAG% ? Tab-Sleuth Release" ^
+  --title "%TAG% - Tab-Sleuth Release" ^
   --generate-notes
 
-if %errorlevel% equ 0 (
-    echo.
-    echo ==============================================================================
-    echo   [SUCCESS] %TAG% Published Successfully to GitHub!
-    echo ==============================================================================
-    echo.
-    echo   Uploaded assets:
-    echo     1. tab-scan-qa.crx            (Signed Chrome extension)
-    echo     2. tab-scan-qa.zip            (Unpacked source package)
-    echo     3. enable-tabscan-updates.bat (1-Click Auto-Update Setup)
-    echo.
-    echo   View release at:
-    echo     https://github.com/trannguyendev/tabscan-sleuth/releases/tag/%TAG%
-    echo ==============================================================================
-) else (
-    echo.
-    echo [ERROR] Failed to create GitHub release.
-)
+if %errorlevel% neq 0 goto :RELEASE_ERROR
 
 echo.
+echo ==============================================================================
+echo   [SUCCESS] %TAG% Published Successfully to GitHub!
+echo ==============================================================================
+echo.
+echo   Uploaded assets:
+echo     1. tab-scan-qa.crx            - Signed Chrome extension
+echo     2. tab-scan-qa.zip            - Unpacked source package
+echo     3. enable-tabscan-updates.bat - 1-Click Auto-Update Setup
+echo.
+echo   View release at:
+echo     https://github.com/trannguyendev/tabscan-sleuth/releases/tag/%TAG%
+echo ==============================================================================
+echo.
 pause
+exit /b 0
+
+:RELEASE_ERROR
+echo.
+echo ==============================================================================
+echo   [ERROR] Failed to create GitHub release.
+echo ==============================================================================
+echo.
+pause
+exit /b 1
