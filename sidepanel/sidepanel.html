@@ -197,10 +197,34 @@
         </div>
 
         <div id="quick-chips" class="quick-chips" aria-label="Suggested prompt questions">
-          <button type="button" class="chip-btn" data-prompt="Summarize this page">⚡ Summarize page</button>
-          <button type="button" class="chip-btn" data-prompt="What are the key takeaways?">🔍 Key takeaways</button>
-          <button type="button" class="chip-btn" data-prompt="Explain the main concepts">💡 Explain concepts</button>
-          <button type="button" class="chip-btn" data-prompt="Find action items and next steps">🎯 Action items</button>
+          <button type="button" class="chip-btn" data-prompt="Summarize this page">
+            <svg class="chip-icon-svg" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <path fill="currentColor" d="M8.5 1.5l-5 7h4l-1 6 6-8h-4.5l1-5h-.5z"/>
+            </svg>
+            <span>Summarize page</span>
+          </button>
+          <button type="button" class="chip-btn" data-prompt="What are the key takeaways?">
+            <svg class="chip-icon-svg" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M10 10l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Key takeaways</span>
+          </button>
+          <button type="button" class="chip-btn" data-prompt="Explain the main concepts">
+            <svg class="chip-icon-svg" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M8 2a4 4 0 0 0-2.5 7.1c.5.4.8 1 .9 1.6h3.2c.1-.6.4-1.2.9-1.6A4 4 0 0 0 8 2z"/>
+              <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M6.5 13h3M7 14.5h2"/>
+            </svg>
+            <span>Explain concepts</span>
+          </button>
+          <button type="button" class="chip-btn" data-prompt="Find action items and next steps">
+            <svg class="chip-icon-svg" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <rect x="2" y="2" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M5 8l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Action items</span>
+          </button>
         </div>
 
         <div id="chat-thread" class="chat-thread" aria-label="Question and answer history"></div>
