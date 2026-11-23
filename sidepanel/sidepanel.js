@@ -116,6 +116,9 @@ const el = {
   updateVersionLabel: document.getElementById('update-version-label'),
   downloadUpdaterLink: document.getElementById('download-updater-link'),
   downloadUpdaterText: document.getElementById('download-updater-text'),
+  downloadProgressBar: document.getElementById('download-progress-bar'),
+  downloadProgressMeta: document.getElementById('download-progress-meta'),
+  downloadIconSlot: document.getElementById('download-icon-slot'),
   viewReleaseLink: document.getElementById('view-release-link'),
   openExtensionsLink: document.getElementById('open-extensions-link'),
   activeVersionIndicator: document.getElementById('active-version-indicator'),
@@ -2758,47 +2761,97 @@ async function handleDownloadUpdater(event) {
 
   link.dataset.downloading = 'true';
   link.setAttribute('aria-busy', 'true');
+  link.dataset.state = 'loading';
 
   const textEl = el.downloadUpdaterText || document.getElementById('download-updater-text') || link;
+  const barEl = el.downloadProgressBar || document.getElementById('download-progress-bar');
+  const metaEl = el.downloadProgressMeta || document.getElementById('download-progress-meta');
   const originalText = textEl ? textEl.textContent : 'Download update.bat';
-  if (textEl) {
-    textEl.textContent = 'Downloading…';
-  }
+
+  if (barEl) barEl.style.width = '15%';
+  if (textEl) textEl.textContent = 'Downloading… 15%';
+  if (metaEl) metaEl.textContent = '~0.8s left';
 
   const targetUrl = link.href || link.getAttribute('href') || 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat';
 
+  // Animate progress smoothly towards 92% during the download
+  const startTime = Date.now();
+  const estimatedTotalMs = 850;
+  let progressInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(92, Math.round(15 + (77 * (1 - Math.exp(-elapsed / 320)))));
+    if (barEl) barEl.style.width = `${progress}%`;
+    if (textEl) textEl.textContent = `Downloading… ${progress}%`;
+    const remainingMs = Math.max(100, estimatedTotalMs - elapsed);
+    const remainingSec = (remainingMs / 1000).toFixed(1);
+    if (metaEl) metaEl.textContent = `~${remainingSec}s left`;
+  }, 50);
+
   try {
-    const result = await downloadUpdateScript({
+    const downloadPromise = downloadUpdateScript({
       url: targetUrl,
       filename: 'update.bat',
       chromeTabs: typeof chrome !== 'undefined' ? chrome.tabs : undefined,
     });
 
+    // Ensure at least a brief perceptible animation cycle so user sees progress and time remaining
+    const [result] = await Promise.all([
+      downloadPromise,
+      new Promise((resolve) => setTimeout(resolve, 650)),
+    ]);
+
+    clearInterval(progressInterval);
+    progressInterval = null;
+
     if (result.success) {
+      if (barEl) barEl.style.width = '100%';
+      link.dataset.state = 'success';
       if (result.method === 'blob') {
         if (textEl) textEl.textContent = 'Downloaded! ✓';
+        if (metaEl) metaEl.textContent = 'update.bat';
         announce('update.bat downloaded. Run it from your Downloads folder to update.');
       } else {
         if (textEl) textEl.textContent = 'Opened in tab ↗';
+        if (metaEl) metaEl.textContent = 'browser tab';
         announce('Update script opened in a new tab.');
       }
     } else {
       console.debug('Updater download unsuccessful:', result.error);
+      link.dataset.state = 'error';
+      if (barEl) barEl.style.width = '0%';
       if (textEl) textEl.textContent = 'Download failed';
+      if (metaEl) metaEl.textContent = '';
       announce('Could not download update script. Please check your internet connection.');
     }
   } catch (err) {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
     console.debug('Updater download encountered an error:', err);
+    link.dataset.state = 'error';
+    if (barEl) barEl.style.width = '0%';
     if (textEl) textEl.textContent = 'Download failed';
+    if (metaEl) metaEl.textContent = '';
     announce('Could not download update script.');
   } finally {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+    }
     setTimeout(() => {
+      if (barEl) {
+        barEl.style.width = '0%';
+      }
       if (textEl && originalText) {
         textEl.textContent = originalText;
       }
+      if (metaEl) {
+        metaEl.textContent = '';
+      }
       delete link.dataset.downloading;
+      delete link.dataset.state;
       link.removeAttribute('aria-busy');
-    }, 2500);
+    }, 3200);
   }
 }
 

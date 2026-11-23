@@ -511,7 +511,7 @@
             <span class="step-badge" aria-hidden="true">2</span>
             <div class="step-body">
               <strong class="step-title">Reload in Chrome</strong>
-              <p class="step-detail">Open <button type="button" id="open-extensions-link" class="link-btn" title="Open extensions manager">chrome://extensions</button> and click the reload (🔄) button on Tab-Sleuth.</p>
+              <p class="step-detail">Open <button type="button" id="open-extensions-link" class="link-btn" title="Open extensions manager">chrome://extensions</button> and click the reload <span class="step-reload-pill" aria-label="Reload extension" title="Reload button in chrome://extensions"><svg class="inline-reload-icon" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 0 1 9.3-3.9L14 6m0-3.5V6h-3.5M13.5 8a5.5 5.5 0 0 1-9.3 3.9L2 10m0 3.5V10h3.5"/></svg>Reload</span> button on Tab-Sleuth.</p>
             </div>
           </div>
         </div>
@@ -525,10 +525,20 @@
             download="update.bat"
             role="button"
           >
-            <svg class="btn-action-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-              <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8 2v8m-3.5-3.5L8 10l3.5-3.5M2.5 13.5h11"/>
-            </svg>
+            <div class="download-progress-bar" id="download-progress-bar" aria-hidden="true"></div>
+            <span class="btn-icon-slot" id="download-icon-slot">
+              <svg class="btn-action-icon btn-download-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8 2v8m-3.5-3.5L8 10l3.5-3.5M2.5 13.5h11"/>
+              </svg>
+              <svg class="btn-action-icon btn-spinner-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="10" stroke-linecap="round"/>
+              </svg>
+              <svg class="btn-action-icon btn-success-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M3.5 8.5l3 3 6-6"/>
+              </svg>
+            </span>
             <span id="download-updater-text">Download update.bat</span>
+            <span class="download-progress-meta" id="download-progress-meta" aria-hidden="true"></span>
           </a>
           <a
             id="view-release-link"
