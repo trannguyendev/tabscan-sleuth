@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tab-Sleuth",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Automatically scans the active tab, detects questions on the page, and answers your questions using the Gemini API maybe it works with Claude too (Im too poor for CLaude API) :))).",
   "update_url": "https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjByWmSmKc+3P88UCmD4I2octO2olfcaNaVnPzqwOzv61Dds+fgdDy0qVACOYhnPnKopTtvHsbr4lMEmmMpMEFBmUCY5a8+OtRnKxOT0FNGSIR6wIewG1I82p+TUy2rRJZ1SL/a9xjtDNy46RrThd56YWylkAv6QePxTFU11ppFMAQUomgQoTopwHSw3Frqoqa0CQAR8cWYy1b/ErLk5rNYP4QGev2v51vp1CysbnG2tpVkeWpZPmqSn3dc2ZCz3ot2aFiD/Vnv5Mzn7w75LJ6z0NCI6TKOwO/nCm+fHtHABZaBmgC1joMAAv4SfurmO8aTQAZYzh7TCjP8SMpvgpgQIDAQAB",
