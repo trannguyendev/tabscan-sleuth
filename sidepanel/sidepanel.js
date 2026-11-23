@@ -117,6 +117,7 @@ const el = {
   downloadUpdaterLink: document.getElementById('download-updater-link'),
   viewReleaseLink: document.getElementById('view-release-link'),
   openExtensionsLink: document.getElementById('open-extensions-link'),
+  activeVersionIndicator: document.getElementById('active-version-indicator'),
 };
 
 const state = {
@@ -2742,10 +2743,19 @@ function renderUpdateBanner(info) {
   }
 }
 
+function initVersionIndicator() {
+  const version = chrome.runtime?.getManifest?.()?.version || '1.0.3';
+  if (el.activeVersionIndicator) {
+    el.activeVersionIndicator.textContent = `v${version.replace(/^v/, '')}`;
+    el.activeVersionIndicator.title = `Tab-Sleuth v${version.replace(/^v/, '')}`;
+    el.activeVersionIndicator.dataset.version = version;
+  }
+}
+
 async function checkExtensionUpdates() {
   try {
-    const manifest = chrome.runtime?.getManifest ? chrome.runtime.getManifest() : { version: '1.0.1' };
-    const currentVersion = manifest?.version || '1.0.1';
+    const manifest = chrome.runtime?.getManifest ? chrome.runtime.getManifest() : { version: '1.0.3' };
+    const currentVersion = manifest?.version || '1.0.3';
     const storage = chrome.storage?.local ? {
       get: (keys) => chrome.storage.local.get(keys),
       set: (obj) => chrome.storage.local.set(obj),
@@ -2773,6 +2783,7 @@ async function checkExtensionUpdates() {
 }
 
 async function init() {
+  initVersionIndicator();
   const currentWindow = await chrome.windows.getCurrent();
   state.windowId = currentWindow.id;
 

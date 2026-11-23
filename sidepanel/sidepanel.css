@@ -343,6 +343,30 @@
     letter-spacing: -0.01em;
   }
 
+  .active-version-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0.125rem 0.45rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    line-height: 1.2;
+    color: var(--brand);
+    background-color: var(--brand-soft);
+    border: 1px solid var(--brand-ring);
+    border-radius: var(--radius-pill);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    letter-spacing: 0.01em;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .active-version-indicator:hover {
+    border-color: var(--brand);
+  }
+
   .header-actions {
     display: flex;
     align-items: center;
@@ -2011,6 +2035,11 @@
       text-overflow: ellipsis;
     }
 
+    .active-version-indicator {
+      font-size: 0.625rem;
+      padding: 0.1rem 0.35rem;
+    }
+
     .header-actions {
       flex-shrink: 0;
       flex-wrap: nowrap;
@@ -2191,6 +2220,7 @@
     .callout,
     .chat-msg,
     .status-badge,
+    .active-version-indicator,
     .empty-state-card,
     button {
       border: 1px solid ButtonText;
