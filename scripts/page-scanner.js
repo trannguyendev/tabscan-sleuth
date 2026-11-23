@@ -53,8 +53,9 @@
   const DROPZONE_TEXT_RE =
     /^[^\p{L}\p{N}]*(?:drag\s*(?:an?\s*)?item\s*here|drag\s*(?:and\s*)?drop\s*here|drop\s*(?:item\s*)?here|place\s*(?:item\s*)?here|move\s*here)[^\p{L}\p{N}]*$/iu;
   const DROPZONE_CLASS_RE =
-    /\b(drop[-_]?zone|droppable|ui-droppable|drop[-_]?target|drop[-_]?box|drag[-_]?here|cloze[-_]?(blank|gap|slot))\b/i;
-  const DRAGGABLE_CLASS_RE = /\b(ui-draggable|draggable|word-chip|drag-item|chip|tile|token)\b/i;
+    /\b(drop[-_]?zone|droppable|ui-droppable|drop[-_]?target|drop[-_]?box|drag[-_]?here|cloze[-_]?(blank|gap|slot)|dnd[-_]?(target|drop|zone|box|slot)|target[-_]?box)\b/i;
+  const DRAGGABLE_CLASS_RE =
+    /\b(ui-draggable|draggable|word-chip|drag-item|chip|tile|token|dnd[-_]?(item|chip)|palette[-_]?item|word[-_]?item)\b/i;
 
   function isDropzonePlaceholderNode(el) {
     if (!el || el.nodeType !== 1) return false;
@@ -315,7 +316,7 @@
     // 4. Collect drag-and-drop word bank + leaf dropzones
     const bankChips = [
       ...root.querySelectorAll(
-        '[draggable="true"], .ui-draggable, [class*="drag-item"], [class*="word-chip"], [class*="chip"], [class*="tile"], [class*="token"], .word-bank > *, .wordbank > *, .bank > *, .pool > *'
+        '[draggable="true"], .ui-draggable, [class*="drag-item"], [class*="word-chip"], [class*="chip"], [class*="tile"], [class*="token"], [class*="dnd_item"], [class*="dnd-item"], [class*="palette_item"], [class*="palette-item"], .word-bank > *, .wordbank > *, .bank > *, .pool > *, [class*="palette"] > *, [class*="word-pool"] > *'
       ),
     ]
       .filter((el) => !isElementHidden(el))

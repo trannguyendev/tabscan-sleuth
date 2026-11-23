@@ -18,9 +18,9 @@
   const DROPZONE_TEXT_RE =
     /^[^\p{L}\p{N}]*(?:drag\s*(?:an?\s*)?item\s*here|drag\s*(?:and\s*)?drop\s*here|drop\s*(?:item\s*)?here|place\s*(?:item\s*)?here|move\s*here)[^\p{L}\p{N}]*$/iu;
   const DROPZONE_CLASS_RE =
-    /\b(drop[-_]?zone|droppable|ui-droppable|drop[-_]?target|drop[-_]?box|drag[-_]?here|cloze[-_]?(blank|gap|slot))\b/i;
+    /\b(drop[-_]?zone|droppable|ui-droppable|drop[-_]?target|drop[-_]?box|drag[-_]?here|cloze[-_]?(blank|gap|slot)|dnd[-_]?(target|drop|zone|box|slot)|target[-_]?box)\b/i;
   const DRAGGABLE_CLASS_RE =
-    /\b(ui-draggable|draggable|drag[-_]?item|word[-_]?chip|chip|tile|token)\b/i;
+    /\b(ui-draggable|draggable|drag[-_]?item|word[-_]?chip|chip|tile|token|dnd[-_]?(item|chip)|palette[-_]?item|word[-_]?item)\b/i;
   const CARD_STOP_PARENTS = new Set([
     'HTML',
     'BODY',
@@ -821,8 +821,9 @@
       for (const node of parts) frag.appendChild(node);
       textNode.replaceWith(frag);
     } else if (parent.childNodes) {
-      const idx = parent.childNodes.indexOf(textNode);
-      if (idx !== -1) {
+      const childList = Array.from(parent.childNodes);
+      const idx = childList.indexOf(textNode);
+      if (idx !== -1 && typeof parent.childNodes.splice === 'function') {
         for (const n of parts) n.parentNode = parent;
         parent.childNodes.splice(idx, 1, ...parts);
       }
@@ -1299,7 +1300,7 @@
     const target = root || document.body;
     if (!target) return [];
     const selector =
-      '[aria-dropeffect], [data-droppable], [data-dropzone], [data-blank], [data-slot], .dropzone, .drop-zone, .droppable, .ui-droppable, .drop-target, .drop-box, .cloze-blank, span, div, button, td';
+      '[aria-dropeffect], [data-droppable], [data-dropzone], [data-blank], [data-slot], .dropzone, .drop-zone, .droppable, .ui-droppable, .drop-target, .drop-box, .cloze-blank, .dnd_target, .dnd-target, .dnd_dropzone, .dnd-dropzone, .dnd_box, .dnd-box, [class*="dropzone"], [class*="droppable"], span, div, button, td';
     const raw = [];
     for (const el of target.querySelectorAll(selector)) {
       if (isDropzoneElement(el)) {
@@ -1329,13 +1330,14 @@
     }
     const parent = anchor?.parentNode;
     if (!parent || !parent.childNodes) return '';
-    const idx = parent.childNodes.indexOf(anchor);
+    const childArr = Array.from(parent.childNodes);
+    const idx = childArr.indexOf(anchor);
     if (idx === -1) return getVisibleTextExcludingBadges(parent);
 
     const snippets = [];
-    for (let offset = Math.max(0, idx - 3); offset <= Math.min(parent.childNodes.length - 1, idx + 3); offset++) {
+    for (let offset = Math.max(0, idx - 3); offset <= Math.min(childArr.length - 1, idx + 3); offset++) {
       if (offset === idx) continue;
-      const sib = parent.childNodes[offset];
+      const sib = childArr[offset];
       if (!sib) continue;
       if (sib.nodeType === 3) {
         snippets.push(sib.textContent || '');
@@ -1711,8 +1713,9 @@
         mark.replaceWith(document.createTextNode(mark.textContent || ''));
         parent.normalize?.();
       } else if (parent.childNodes) {
-        const idx = parent.childNodes.indexOf(mark);
-        if (idx !== -1) {
+        const childArr = Array.from(parent.childNodes);
+        const idx = childArr.indexOf(mark);
+        if (idx !== -1 && typeof parent.childNodes.splice === 'function') {
           const tn = document.createTextNode(mark.textContent || '');
           tn.parentNode = parent;
           parent.childNodes.splice(idx, 1, tn);
@@ -1994,15 +1997,18 @@
           wordText && (item.question_type === 'drag_drop' || dropzone)
             ? findDraggableSourceElement(wordText, scope, usedDragSources)
             : null;
-        if (dropzone && sourceChip && (item.question_type === 'drag_drop' || isWordBankChipLike(sourceChip))) {
-          usedDragSources.add(sourceChip);
+        const alreadyFilled = dropzone && isDropzoneFilledWith(dropzone, wordText);
+        if (dropzone && (alreadyFilled || (sourceChip && (item.question_type === 'drag_drop' || isWordBankChipLike(sourceChip))))) {
+          if (sourceChip) usedDragSources.add(sourceChip);
           const slot = i % PAIR_CLASSES.length;
           const pairClass = PAIR_CLASSES[slot];
-          markElement(sourceChip, HIGHLIGHT_CLASS, qLabel, 'highlight', {
-            extraClass: pairClass,
-            pairSlot: slot,
-          });
-          markElement(dropzone, HIGHLIGHT_CLASS, `${qLabel}: ${truncateLabel(wordText, 18)}`, 'highlight', {
+          if (sourceChip) {
+            markElement(sourceChip, HIGHLIGHT_CLASS, qLabel, 'highlight', {
+              extraClass: pairClass,
+              pairSlot: slot,
+            });
+          }
+          markElement(dropzone, HIGHLIGHT_CLASS, `${qLabel}: ${truncateLabel(wordText, 18)}${alreadyFilled ? ' (placed)' : ''}`, 'highlight', {
             extraClass: pairClass,
             pairSlot: slot,
           });
@@ -2011,7 +2017,7 @@
           details.push({
             index: item.index ?? i + 1,
             matched: true,
-            controlCount: 2,
+            controlCount: sourceChip ? 2 : 1,
             rangeCount: 0,
             kind: 'drag_drop',
           });
@@ -2325,7 +2331,25 @@
             ? findDraggableSourceElement(wordValue, scope, usedDragSources)
             : null;
 
-        if (dropzone && sourceChip && (item.question_type === 'drag_drop' || isWordBankChipLike(sourceChip))) {
+        if (dropzone && isDropzoneFilledWith(dropzone, wordValue)) {
+          appliedHere = true;
+          controlType = 'drag_drop';
+          if (highlightMatched) {
+            const slot = i % PAIR_CLASSES.length;
+            const pairClass = PAIR_CLASSES[slot];
+            markElement(
+              dropzone,
+              APPLIED_CLASS,
+              `✓ ${qLabel}: ${truncateLabel(wordValue, 18)} (already placed)`,
+              'applied',
+              {
+                extraClass: pairClass,
+                pairSlot: slot,
+              }
+            );
+            if (!firstTarget) firstTarget = dropzone;
+          }
+        } else if (dropzone && sourceChip && (item.question_type === 'drag_drop' || isWordBankChipLike(sourceChip))) {
           usedDragSources.add(sourceChip);
           await performDragAndDrop(sourceChip, dropzone, Math.min(35, pairDelayMs));
           appliedHere = true;

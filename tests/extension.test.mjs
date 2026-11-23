@@ -3216,6 +3216,123 @@ test('updateStatus helper is defined in sidepanel.js and wires status badge with
   assert.match(code, /setStatusBadge\(badgeState,\s*icon\s*\|\|\s*defaultIcons\[badgeState\]/);
 });
 
+test('page-actions and scanner handle passage-referenced vocabulary drag-and-drop with partially filled examples', async () => {
+  const scannerCode = await fs.readFile(path.join(ROOT_DIR, 'scripts', 'page-scanner.js'), 'utf8');
+  const actionsCode = await fs.readFile(path.join(ROOT_DIR, 'scripts', 'page-actions.js'), 'utf8');
+
+  const dom = createMiniDom({
+    url: 'https://example.com/pearson-reading-passage-dnd',
+    title: 'NorthStar Reading Vocabulary Drag and Drop',
+  });
+  const { document: doc } = dom;
+
+  // Exercise instructions
+  const instr = doc.createElement('div', { class: 'directions' }, [
+    'Read the passage, which contains the vocabulary items from the box below. Then drag the items to complete the sentences. You may want to check how each item is used in the reading before you make your choice.',
+  ]);
+  doc.body.appendChild(instr);
+
+  // Remaining word bank chips in movable palette (incur and stands above the crowd already used)
+  const remainingWords = ['savvy', 'postulates', 'calculus', 'better suited', 'fruitful', 'Not bad'];
+  let activeWord = null;
+  let didMove = false;
+  const chips = remainingWords.map((word, idx) => {
+    const chip = doc.createElement('div', { class: 'dnd_item ui-draggable', 'data-word': word }, [word]);
+    chip.mockRect = { left: 100 + idx * 75, top: 50, width: 70, height: 28 };
+    chip.addEventListener('mousedown', () => {
+      activeWord = word;
+      didMove = false;
+    });
+    return chip;
+  });
+
+  const palette = doc.createElement('div', { class: 'dnd_palette ui-dialog' }, [
+    doc.createElement('div', { class: 'palette-header' }, ['Move']),
+    ...chips,
+  ]);
+  doc.body.appendChild(palette);
+
+  doc.addEventListener('mousemove', () => {
+    if (activeWord) didMove = true;
+  });
+
+  const sentences = [
+    { num: '1', text: "I'm renting a car. I am allowed to drive 150 miles per day with no extra charge, but for every mile beyond that I ", after: ' a cost of 10 cents.', word: 'incur', filled: true },
+    { num: '2', text: 'Our orchestra has a lot of good violinists, but none is as good as Eric. He really ', after: ' because he plays with a fantastic feel for the music.', word: 'stands above the crowd', filled: true },
+    { num: '3', text: 'The system of selling stocks in the stock market is not like most buying and selling. Your broker is willing to let you sell at any time, because the brokerage company ', after: ' that there is always a buyer available.', word: 'postulates', filled: false },
+    { num: '4', text: 'Any accurate ', after: ' of the cost of travel has to include small expenses such as snacks at airports and tips for taxi drivers.', word: 'calculus', filled: false },
+    { num: '5', text: "People are often willing to buy popcorn or cookies from a child who comes to their door selling them, even though the people wouldn't buy them online. Selling in person is very ", after: ' for any young person hoping to earn money for a club.', word: 'fruitful', filled: false },
+    { num: '6', text: 'I heard that the hotel is willing to cut the price to $65 per night. ', after: ', but I bet we can convince them to cut it even more.', word: 'Not bad', filled: false },
+    { num: '7', text: "I'm not good at creating web pages, but Carl is a very ", after: ' designer.', word: 'savvy', filled: false },
+    { num: '8', text: 'The job of giving the introductory speech at the conference should go to you, not me. You are confident and articulate, and you are much ', after: ' to that kind of thing.', word: 'better suited', filled: false },
+  ];
+
+  const dropzones = [];
+  for (let i = 0; i < sentences.length; i++) {
+    const s = sentences[i];
+    const row = doc.createElement('div', { class: 'sentence-row' });
+    const numEl = doc.createElement('strong', {}, [s.num + ' ']);
+    row.appendChild(numEl);
+    row.appendChild(doc.createTextNode(s.text));
+
+    const dz = doc.createElement('span', { class: 'dnd_target ui-droppable' });
+    dz.mockRect = { left: 280, top: 120 + i * 45, width: 140, height: 30 };
+    if (s.filled) {
+      dz.appendChild(doc.createTextNode(s.word));
+      dz.classList.add('filled');
+    } else {
+      const placeholder = doc.createElement('span', { class: 'dnd_placeholder' }, ['DRAG ITEM HERE']);
+      dz.appendChild(placeholder);
+    }
+
+    dz.addEventListener('mouseup', () => {
+      if (activeWord && didMove) {
+        dz.replaceChildren(doc.createTextNode(activeWord));
+        dz.classList.add('filled');
+        activeWord = null;
+        didMove = false;
+      }
+    });
+
+    dropzones.push(dz);
+    row.appendChild(dz);
+    row.appendChild(doc.createTextNode(s.after));
+    doc.body.appendChild(row);
+  }
+
+  // 1. Verify page scanner extracts the word bank and detects cloze blanks
+  const scanRes = vm.runInNewContext(scannerCode, dom);
+  assert.equal(scanRes.kind, 'ready');
+  assert.ok(scanRes.text.includes('DRAG ITEM HERE'));
+  const dndCandidates = scanRes.questionCandidates.filter((c) => c.type === 'drag_drop');
+  assert.equal(dndCandidates.length, 8);
+
+  // 2. Verify page actions highlights and applies both already-filled examples and remaining blanks
+  const api = vm.runInNewContext(actionsCode, dom);
+  const items = sentences.map((s, idx) => ({
+    index: idx + 1,
+    question: `${s.num} ${s.text}[BLANK: DRAG ITEM HERE]${s.after}`,
+    question_type: 'drag_drop',
+    options: remainingWords,
+    selected_options: [s.word],
+    apply_value: s.word,
+    answer: s.word,
+  }));
+
+  const hlRes = api.highlightAnswers(items);
+  assert.equal(hlRes.matchedQuestions, 8);
+
+  const applyRes = await api.applyAnswers(items, { pairDelayMs: 0 });
+  assert.equal(applyRes.appliedCount, 8);
+  assert.equal(applyRes.skippedCount, 0);
+
+  for (let i = 0; i < sentences.length; i++) {
+    assert.equal(applyRes.results[i].status, 'applied');
+    assert.equal(dropzones[i].childNodes[0].textContent, sentences[i].word);
+  }
+});
+
+
 
 
 
