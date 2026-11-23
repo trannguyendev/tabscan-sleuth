@@ -3207,6 +3207,16 @@ test('sidepanel.js guards screenshot captures on restricted URLs and suppresses 
   assert.match(code, /console\.debug\('captureVisibleTab restricted by browser policy:', errMsg\)/);
 });
 
+test('updateStatus helper is defined in sidepanel.js and wires status badge with fallback icons', async () => {
+  const code = await fs.readFile(path.join(ROOT_DIR, 'sidepanel', 'sidepanel.js'), 'utf8');
+
+  // Verify function updateStatus is declared
+  assert.match(code, /function updateStatus\(badgeState,\s*text,\s*icon\)/);
+  // Verify it calls setStatusBadge
+  assert.match(code, /setStatusBadge\(badgeState,\s*icon\s*\|\|\s*defaultIcons\[badgeState\]/);
+});
+
+
 
 
 

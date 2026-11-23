@@ -156,6 +156,17 @@ function setStatusBadge(badgeState, icon, text) {
   el.scanStatusText.textContent = text;
 }
 
+function updateStatus(badgeState, text, icon) {
+  const defaultIcons = {
+    scanning: '↻',
+    ready: '✓',
+    restricted: '⚠',
+    error: '⚠',
+    idle: '○',
+  };
+  setStatusBadge(badgeState, icon || defaultIcons[badgeState] || '•', text);
+}
+
 function updateHeaderControls() {
   const activeModel = resolveActiveModel(state.settings);
   el.modelPill.textContent = activeModel;
