@@ -29,6 +29,7 @@ import {
   getQueryCache,
   setQueryCache,
 } from '../shared/cache-manager.js';
+import { checkGitHubRelease } from '../shared/update-checker.js';
 
 const el = {
   autoScanToggle: document.getElementById('auto-scan-toggle'),
@@ -106,6 +107,16 @@ const el = {
   autoHighlightCheckbox: document.getElementById('auto-highlight-checkbox'),
   autoApplyCheckbox: document.getElementById('auto-apply-checkbox'),
   srAnnouncer: document.getElementById('sr-announcer'),
+  updateBanner: document.getElementById('update-banner'),
+  updateBannerText: document.getElementById('update-banner-text'),
+  updateBannerBtn: document.getElementById('update-banner-btn'),
+  updateBannerDismiss: document.getElementById('update-banner-dismiss'),
+  updateModal: document.getElementById('update-modal'),
+  updateModalClose: document.getElementById('update-modal-close'),
+  updateVersionLabel: document.getElementById('update-version-label'),
+  downloadUpdaterLink: document.getElementById('download-updater-link'),
+  viewReleaseLink: document.getElementById('view-release-link'),
+  openExtensionsLink: document.getElementById('open-extensions-link'),
 };
 
 const state = {
@@ -2679,6 +2690,68 @@ function wireEventListeners() {
       handlePendingAction();
     }
   });
+
+  // Wire Update banner and modal controls
+  if (el.updateBannerBtn) {
+    el.updateBannerBtn.addEventListener('click', () => {
+      if (typeof el.updateModal?.showModal === 'function') {
+        el.updateModal.showModal();
+      }
+    });
+  }
+
+  if (el.updateBannerDismiss) {
+    el.updateBannerDismiss.addEventListener('click', () => {
+      if (el.updateBanner) el.updateBanner.hidden = true;
+    });
+  }
+
+  if (el.updateModalClose) {
+    el.updateModalClose.addEventListener('click', () => {
+      if (typeof el.updateModal?.close === 'function') {
+        el.updateModal.close();
+      }
+    });
+  }
+
+  if (el.openExtensionsLink) {
+    el.openExtensionsLink.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'chrome://extensions' });
+    });
+  }
+}
+
+async function checkExtensionUpdates() {
+  try {
+    const manifest = chrome.runtime?.getManifest ? chrome.runtime.getManifest() : { version: '1.0.1' };
+    const currentVersion = manifest?.version || '1.0.1';
+    const storage = chrome.storage?.local ? {
+      get: (keys) => chrome.storage.local.get(keys),
+      set: (obj) => chrome.storage.local.set(obj),
+    } : null;
+
+    const result = await checkGitHubRelease({
+      currentVersion,
+      storage,
+    });
+
+    if (result?.hasUpdate && el.updateBanner) {
+      el.updateBannerText.textContent = `New version available (${result.latestVersion})!`;
+      el.updateBanner.hidden = false;
+
+      if (el.updateVersionLabel) {
+        el.updateVersionLabel.textContent = `${result.latestVersion} Ready`;
+      }
+      if (el.viewReleaseLink && result.releaseUrl) {
+        el.viewReleaseLink.href = result.releaseUrl;
+      }
+      if (el.downloadUpdaterLink && result.updaterBatUrl) {
+        el.downloadUpdaterLink.href = result.updaterBatUrl;
+      }
+    }
+  } catch (err) {
+    console.debug('Update check skipped:', err);
+  }
 }
 
 async function init() {
@@ -2687,6 +2760,9 @@ async function init() {
 
   await loadSettings();
   wireEventListeners();
+
+  // Non-blocking update check
+  checkExtensionUpdates();
 
   // Check if opened via context menu first; otherwise auto-scan the active tab
   const pending = await chrome.storage.session.get(STORAGE_KEYS.PENDING_ACTION);

@@ -2920,4 +2920,40 @@ test('streamCustomQuestion passes onRetry callback during rate limit pause and r
   assert.equal(result.text, 'Final answer after reset');
 });
 
+test('update-checker parses semver and detects newer versions correctly', async () => {
+  const { parseSemver, isNewerVersion, checkGitHubRelease } = await import('../shared/update-checker.js');
+
+  assert.deepEqual(parseSemver('1.0.1'), [1, 0, 1]);
+  assert.deepEqual(parseSemver('v1.2.3'), [1, 2, 3]);
+  assert.deepEqual(parseSemver('v2.0'), [2, 0, 0]);
+
+  assert.equal(isNewerVersion('v1.0.2', '1.0.1'), true);
+  assert.equal(isNewerVersion('v1.1.0', '1.0.9'), true);
+  assert.equal(isNewerVersion('v2.0.0', '1.9.9'), true);
+  assert.equal(isNewerVersion('v1.0.1', '1.0.1'), false);
+  assert.equal(isNewerVersion('v1.0.0', '1.0.1'), false);
+
+  // Mock GitHub API release check
+  const mockFetch = async () => ({
+    ok: true,
+    json: async () => ({
+      tag_name: 'v1.0.2',
+      name: 'Release 1.0.2',
+      html_url: 'https://github.com/trannguyendev/tabscan-sleuth/releases/tag/v1.0.2',
+    }),
+  });
+
+  const result = await checkGitHubRelease({
+    currentVersion: '1.0.1',
+    fetchFn: mockFetch,
+    force: true,
+  });
+
+  assert.equal(result.hasUpdate, true);
+  assert.equal(result.latestVersion, 'v1.0.2');
+  assert.ok(result.downloadUrl.includes('tab-scan-qa.zip'));
+  assert.ok(result.updaterBatUrl.includes('update.bat'));
+});
+
+
 

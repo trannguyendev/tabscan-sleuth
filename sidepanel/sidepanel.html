@@ -9,6 +9,21 @@
 </head>
 <body>
   <div class="app-shell">
+    <div id="update-banner" class="update-banner" hidden>
+      <div class="update-banner-content">
+        <svg class="update-banner-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+          <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="16" r="1" fill="currentColor"/>
+        </svg>
+        <span id="update-banner-text" class="update-banner-text">Update available</span>
+      </div>
+      <div class="update-banner-actions">
+        <button type="button" id="update-banner-btn" class="btn-update-action">Upgrade</button>
+        <button type="button" id="update-banner-dismiss" class="btn-update-dismiss" aria-label="Dismiss update notification">&times;</button>
+      </div>
+    </div>
+
     <header class="panel-header">
       <div class="header-top">
         <div class="brand">
@@ -458,6 +473,39 @@
         <button type="submit" class="btn-primary">Save Settings</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="update-modal" class="settings-dialog update-dialog">
+    <div class="dialog-content update-dialog-content">
+      <div class="dialog-header">
+        <h2>Tab-Sleuth Update</h2>
+        <button type="button" id="update-modal-close" class="btn-icon" aria-label="Close update dialog">&times;</button>
+      </div>
+      <div class="update-dialog-body">
+        <div class="update-version-badge" id="update-version-label">v1.0.2 Ready</div>
+        <p class="update-desc">A newer version of Tab-Sleuth is available on GitHub.</p>
+        <div class="update-steps-card">
+          <div class="update-step-item">
+            <span class="step-badge">1</span>
+            <div>
+              <strong>Run the Updater</strong>
+              <p>Double-click the <em>Update Tab-Sleuth</em> shortcut on your Desktop, or click <strong>Download update.bat</strong> below.</p>
+            </div>
+          </div>
+          <div class="update-step-item">
+            <span class="step-badge">2</span>
+            <div>
+              <strong>Reload in Chrome</strong>
+              <p>Open <button type="button" id="open-extensions-link" class="link-btn">chrome://extensions</button> and click the reload (🔄) button on Tab-Sleuth.</p>
+            </div>
+          </div>
+        </div>
+        <div class="update-dialog-actions">
+          <a id="download-updater-link" class="btn btn-primary" href="https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat" download="update.bat">Download update.bat</a>
+          <a id="view-release-link" class="btn btn-ghost" target="_blank" rel="noopener noreferrer">Release Notes</a>
+        </div>
+      </div>
+    </div>
   </dialog>
 
   <div id="sr-announcer" class="visually-hidden" aria-live="polite"></div>

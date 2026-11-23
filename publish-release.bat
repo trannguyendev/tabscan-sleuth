@@ -57,13 +57,14 @@ if %errorlevel% neq 0 (
     echo [WARNING] Git push failed or nothing to commit. Continuing...
 )
 
-:: 4. Create GitHub Release and upload ALL assets: CRX, ZIP, and BAT!
+:: 4. Create GitHub Release and upload ALL assets: Installer, Updater, ZIP, and CRX!
 echo.
 echo Publishing %TAG% to GitHub Releases with all assets...
 "C:\Program Files\GitHub CLI\gh.exe" release create %TAG% ^
-  "dist/tab-scan-qa.crx#tab-scan-qa.crx" ^
+  "Install-TabSleuth.bat#Install-TabSleuth.bat" ^
+  "update.bat#update.bat" ^
   "dist/tab-scan-qa.zip#tab-scan-qa.zip" ^
-  "enable-tabscan-updates.bat#enable-tabscan-updates.bat" ^
+  "dist/tab-scan-qa.crx#tab-scan-qa.crx" ^
   --repo trannguyendev/tabscan-sleuth ^
   --title "%TAG% - Tab-Sleuth Release" ^
   --generate-notes
@@ -76,9 +77,10 @@ echo   [SUCCESS] %TAG% Published Successfully to GitHub!
 echo ==============================================================================
 echo.
 echo   Uploaded assets:
-echo     1. tab-scan-qa.crx            - Signed Chrome extension
-echo     2. tab-scan-qa.zip            - Unpacked source package
-echo     3. enable-tabscan-updates.bat - 1-Click Auto-Update Setup
+echo     1. Install-TabSleuth.bat  - 1-Click Installer for new users
+echo     2. update.bat             - 1-Click Updater for existing users
+echo     3. tab-scan-qa.zip        - Unpacked source package
+echo     4. tab-scan-qa.crx        - Signed Chrome extension
 echo.
 echo   View release at:
 echo     https://github.com/trannguyendev/tabscan-sleuth/releases/tag/%TAG%

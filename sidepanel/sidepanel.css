@@ -1539,6 +1539,181 @@
     background-color: rgba(15, 23, 42, 0.55);
   }
 
+  /* Update Banner */
+  .update-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    background: linear-gradient(135deg, var(--accent-honey-soft), var(--brand-soft));
+    border-block-end: 1px solid var(--accent-honey);
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+    position: relative;
+    z-index: 20;
+    animation: bannerSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes bannerSlideDown {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .update-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 500;
+  }
+
+  .update-banner-icon {
+    color: var(--accent-honey);
+    flex-shrink: 0;
+  }
+
+  .update-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .btn-update-action {
+    background-color: var(--brand);
+    color: var(--brand-text);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.2rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+
+  .btn-update-action:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  .btn-update-action:active {
+    transform: translateY(0);
+  }
+
+  .btn-update-dismiss {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.15rem 0.3rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .btn-update-dismiss:hover {
+    color: var(--text-primary);
+    background-color: rgba(0, 0, 0, 0.06);
+  }
+
+  /* Update Dialog */
+  .update-dialog-body {
+    padding: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .update-version-badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    border-radius: 9999px;
+    background-color: var(--brand-soft);
+    color: var(--brand);
+    border: 1px solid var(--brand);
+  }
+
+  .update-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .update-steps-card {
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .update-step-item {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.825rem;
+    line-height: 1.4;
+  }
+
+  .update-step-item p {
+    margin: 0.15rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+  }
+
+  .step-badge {
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    border-radius: 50%;
+    background-color: var(--brand);
+    color: var(--brand-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.725rem;
+    flex-shrink: 0;
+    margin-block-start: 0.1rem;
+  }
+
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--brand);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .update-dialog-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+
+  .update-dialog-actions .btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    text-align: center;
+  }
+
   .dialog-header {
     display: flex;
     align-items: center;

@@ -245,7 +245,7 @@ export function createZipBuffer(entries) {
  */
 export function collectExtensionFiles(rootDir, options = {}) {
   const includedDirs = options.includedDirs || ['icons', 'scripts', 'shared', 'sidepanel'];
-  const includedRootFiles = options.includedRootFiles || ['manifest.json', 'service-worker.js'];
+  const includedRootFiles = options.includedRootFiles || ['manifest.json', 'service-worker.js', 'update.bat'];
   const excludePatterns = options.excludePatterns || [
     /^[._]/,
     /\.pem$/i,

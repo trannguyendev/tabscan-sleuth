@@ -216,24 +216,26 @@ TabScan Q&A does not merely answer questions; it can interact with the page to s
 6. Click the extension puzzle piece icon in the browser toolbar and pin **TabScan Q&A**.
 7. Click the **TabScan Q&A** toolbar icon to open the Side Panel.
 
-### Option B: Install Packaged CRX3 File (With Automatic Updates)
+### Option B: 1-Click Bootstrap Installer & Desktop Updater (Recommended for End Users)
 
-> [!IMPORTANT]
-> **Windows Chrome Users (Free Web Store Bypass & Silent Auto-Updates)**:  
-> Google Chrome restricts third-party `.crx` files unless they are published to the Chrome Web Store ($5 fee) or whitelisted in Chrome's enterprise policy. To install the `.crx` and enable **automatic silent background updates** from GitHub for free:
+> [!TIP]
+> **Zero Configuration Setup**:  
+> No need to manually extract zips or configure paths!
 > 
-> 1. Run the one-time allowlist setup:
->    - Double-click [`enable-tabscan-updates.bat`](enable-tabscan-updates.bat) (or merge [`enable-tabscan-updates.reg`](enable-tabscan-updates.reg))
->    - *Or run this single PowerShell command:*
->      ```powershell
->      reg add "HKCU\Software\Policies\Google\Chrome\ExtensionInstallAllowlist" /v 1 /t REG_SZ /d "jjoepgfpagdecpcbabppbbnblaeklpic" /f
->      ```
-> 2. Open Google Chrome (or Brave / Edge) and go to `chrome://extensions`.
-> 3. In the top-right corner, toggle **Developer mode** to **ON**.
-> 4. Drag and drop `tab-scan-qa.crx` (from the latest release or `dist/`) directly onto the `chrome://extensions` tab.
-> 5. When prompted with *"Add TabScan Q&A?"*, click **Add extension**.
+> 1. Download [`Install-TabSleuth.bat`](https://github.com/trannguyendev/tabscan-sleuth/releases/latest/download/Install-TabSleuth.bat) from the latest release.
+> 2. Double-click **`Install-TabSleuth.bat`**:
+>    - Installs Tab-Sleuth cleanly into `%LOCALAPPDATA%\TabSleuth` (immune to accidental deletion).
+>    - Automatically copies the folder path to your clipboard.
+>    - Creates an **"Update Tab-Sleuth"** shortcut directly on your Desktop.
+>    - Opens Chrome to `chrome://extensions`.
+> 3. In the Chrome tab that opens:
+>    - Turn **Developer mode** **ON** (toggle switch in the top-right corner).
+>    - Click **Load unpacked** (top-left).
+>    - Press `Ctrl+V` to paste the path and hit **Enter / Select Folder**.
 > 
-> ✨ **Auto-Update Enabled**: Once installed, Chrome will automatically poll `dist/updates.xml` on GitHub and silently update TabScan Q&A in the background whenever you publish a new version. No manual updates needed!
+> 🔄 **How to Update Later**:
+> - Whenever an update is published on GitHub, an **"Update available"** banner will light up inside the extension!
+> - Simply double-click the **"Update Tab-Sleuth"** shortcut on your Desktop, then click the reload (🔄) button in Chrome!
 
 ### Configuration & API Keys
 
