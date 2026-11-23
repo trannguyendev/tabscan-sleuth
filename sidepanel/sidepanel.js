@@ -1125,6 +1125,19 @@ async function normalizeImageDataUrl(rawDataUrl, mimeType = 'image/jpeg', opts =
 
 async function captureVisibleViewportRaw(windowId) {
   if (!windowId) return null;
+
+  // Pre-check: If the active tab in this window is not scannable (e.g. chrome://extensions, internal pages),
+  // skip capture immediately before calling chrome.tabs.captureVisibleTab.
+  try {
+    const tabs = await chrome.tabs.query({ active: true, windowId });
+    const activeTab = tabs?.[0];
+    if (activeTab?.url && !isScannableUrl(activeTab.url)) {
+      return null;
+    }
+  } catch {
+    // If querying tabs fails, proceed to attempt capture with safety net
+  }
+
   const elapsed = Date.now() - lastCaptureTabCallAt;
   if (elapsed < CAPTURE_MIN_INTERVAL_MS) {
     await delayMs(CAPTURE_MIN_INTERVAL_MS - elapsed);
@@ -1154,7 +1167,14 @@ async function captureVisibleViewportRaw(windowId) {
         await delayMs(650);
         continue;
       }
-      console.warn('captureVisibleTab skipped:', err?.message || err);
+      const errMsg = String(err?.message || err || '');
+      const isExpectedRestriction =
+        /all_urls|activeTab|cannot access|restricted|extensions gallery|chrome:\/\/|devtools:\/\//i.test(errMsg);
+      if (isExpectedRestriction) {
+        console.debug('captureVisibleTab restricted by browser policy:', errMsg);
+      } else {
+        console.warn('captureVisibleTab skipped:', errMsg);
+      }
       return null;
     }
   }
@@ -1162,7 +1182,7 @@ async function captureVisibleViewportRaw(windowId) {
 }
 
 async function tryCaptureVisibleTab(windowId, tab) {
-  if (!windowId) return null;
+  if (!windowId || (tab?.url && !isScannableUrl(tab.url))) return null;
   const now = Date.now();
   if (
     recentCaptureCache.tabId === tab?.id &&
@@ -1284,7 +1304,7 @@ async function captureFullPageScreenshots(
   windowId,
   { fullPage = true, generation = state.scanGeneration, bypassCache = false } = {}
 ) {
-  if (!windowId) return [];
+  if (!windowId || (tab?.url && !isScannableUrl(tab.url))) return [];
   const now = Date.now();
   if (
     !bypassCache &&

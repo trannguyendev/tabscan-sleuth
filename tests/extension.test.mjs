@@ -3195,6 +3195,18 @@ test('sidepanel.html update modal markup conforms to accessible MV3 and download
   assert.match(html, /id="view-release-link"/i);
 });
 
+test('sidepanel.js guards screenshot captures on restricted URLs and suppresses policy permission warnings', async () => {
+  const code = await fs.readFile(path.join(ROOT_DIR, 'sidepanel', 'sidepanel.js'), 'utf8');
+
+  // Verify pre-checks prevent captureVisibleTab on unscannable URLs
+  assert.match(code, /if\s*\(activeTab\?\.url\s*&&\s*!isScannableUrl\(activeTab\.url\)\)\s*\{\s*return null;\s*\}/);
+  assert.match(code, /async function tryCaptureVisibleTab\(windowId,\s*tab\)\s*\{\s*if\s*\(!windowId\s*\|\|\s*\(tab\?\.url\s*&&\s*!isScannableUrl\(tab\.url\)\)\)/);
+  assert.match(code, /async function captureFullPageScreenshots\([\s\S]*?if\s*\(!windowId\s*\|\|\s*\(tab\?\.url\s*&&\s*!isScannableUrl\(tab\.url\)\)\)/);
+
+  // Verify policy restriction errors log as debug rather than console.warn
+  assert.match(code, /console\.debug\('captureVisibleTab restricted by browser policy:', errMsg\)/);
+});
+
 
 
 
