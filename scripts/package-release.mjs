@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * TabScan Q&A - Zero-Dependency CRX3 Packaging & Auto-Update Pipeline
+ * Tab-Sleuth - Zero-Dependency CRX3 Packaging & Auto-Update Pipeline
  *
  * Packages extension files into a cryptographically signed Chromium CRX3 package,
  * generates an Omaha v2.0 update manifest XML, and produces distribution metadata.
@@ -704,10 +704,10 @@ export function packageRelease(options = {}) {
   const outDir = path.resolve(options.outDir || path.join(rootDir, 'dist'));
   const updateUrl =
     options.updateUrl ||
-    'https://raw.githubusercontent.com/username/tabscan-qa/main/dist/updates.xml';
+    'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml';
   const codebaseUrl =
     options.codebaseUrl ||
-    'https://raw.githubusercontent.com/username/tabscan-qa/main/dist/tab-scan-qa.crx';
+    'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/tab-sleuth.crx';
   const prodversionmin = options.prodversionmin || '116.0.0.0';
 
   // 1. Read manifest.json
@@ -782,8 +782,8 @@ export function packageRelease(options = {}) {
     fs.mkdirSync(outDir, { recursive: true });
   }
 
-  const crxFile = path.join(outDir, 'tab-scan-qa.crx');
-  const zipFile = path.join(outDir, 'tab-scan-qa.zip');
+  const crxFile = path.join(outDir, 'tab-sleuth.crx');
+  const zipFile = path.join(outDir, 'tab-sleuth.zip');
   const xmlFile = path.join(outDir, 'updates.xml');
   const metaFile = path.join(outDir, 'release-metadata.json');
 
@@ -848,7 +848,7 @@ function parseArgs(args) {
 
 function printHelp() {
   console.log(`
-TabScan Q&A - CRX3 Release Packager & Auto-Update Pipeline
+Tab-Sleuth - CRX3 Release Packager & Auto-Update Pipeline
 
 USAGE:
   node scripts/package-release.mjs [options]
@@ -857,13 +857,13 @@ OPTIONS:
   --key=<path>           Path to RSA private key PEM (default: key.pem)
   --out=<dir>            Output directory for release artifacts (default: dist/)
   --update-url=<url>     URL to hosted updates.xml
-  --codebase-url=<url>   Download URL to hosted tab-scan-qa.crx
+  --codebase-url=<url>   Download URL to hosted tab-sleuth.crx
   --version=<ver>        Override extension version
   -h, --help             Show this help message
 
 GENERATED ARTIFACTS:
-  <out>/tab-scan-qa.crx         Signed Chromium CRX3 binary
-  <out>/tab-scan-qa.zip         Standard ZIP archive for distribution
+  <out>/tab-sleuth.crx         Signed Chromium CRX3 binary
+  <out>/tab-sleuth.zip         Standard ZIP archive for distribution
   <out>/updates.xml             Omaha v2.0 update manifest
   <out>/release-metadata.json   Release checksums, App ID, and metadata
 `);
@@ -881,7 +881,7 @@ if (isMain) {
   }
 
   try {
-    console.log('📦 Packaging TabScan Q&A extension release...');
+    console.log('📦 Packaging Tab-Sleuth extension release...');
     const result = packageRelease(cliArgs);
 
     console.log('\n✅ Packaging complete!');

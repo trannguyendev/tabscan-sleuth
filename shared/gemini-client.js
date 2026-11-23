@@ -520,7 +520,7 @@ export async function analyzePageQuestions({
       : 'Keep each answer direct, crisp, and focused (1-3 sentences for explanation).';
 
   const systemInstruction = [
-    'You are TabScan Q&A, an accurate webpage analysis and question-answering assistant.',
+    'You are Tab-Sleuth, an accurate webpage analysis and question-answering assistant.',
     'Analyze the scanned active browser tab content (ALL extracted DOM text together with ALL attached full-page scroll captures and embedded page images) and return valid JSON matching the schema.',
     '1. Identify real questions, prompts, writing/editing tasks, or problems across BOTH page text and embedded passage/chart/summary/diagram images or PDFs.',
     '2. Ignore generic navigation links, cookie banners, or rhetorical marketing taglines.',
@@ -823,7 +823,7 @@ export async function streamCustomQuestion({
       : 'Be direct, concise, and practical. Lead with the exact answer, then briefly explain why.';
 
   const systemInstruction = [
-    'You are TabScan Q&A, an assistant answering questions about the user\'s active browser tab.',
+    'You are Tab-Sleuth, an assistant answering questions about the user\'s active browser tab.',
     styleRule,
     'Inspect BOTH the scanned DOM text and ALL attached full-page screenshots and embedded passage/chart/diagram images together (or PDFs).',
     'When the answer relies on facts from the page or screen, cite or quote the relevant part concisely.',
@@ -1283,7 +1283,7 @@ async function analyzePageQuestionsWithClaude({
       : 'Keep each answer direct, crisp, and focused (1-3 sentences for explanation).';
 
   const systemPrompt = [
-    'You are TabScan Q&A, an accurate webpage analysis and question-answering assistant.',
+    'You are Tab-Sleuth, an accurate webpage analysis and question-answering assistant.',
     'Analyze the scanned active browser tab content (ALL extracted DOM text together with ALL attached full-page scroll captures and embedded page images) and return valid JSON matching the schema.',
     '1. Identify real questions, prompts, writing/editing tasks, or problems across BOTH page text and embedded passage/chart/summary/diagram images or PDFs.',
     '2. Ignore generic navigation links, cookie banners, or rhetorical marketing taglines.',
@@ -1408,7 +1408,7 @@ async function streamCustomQuestionWithClaude({
       : 'Be direct, concise, and practical. Lead with the exact answer, then briefly explain why.';
 
   const systemPrompt = [
-    "You are TabScan Q&A, an assistant answering questions about the user's active browser tab.",
+    "You are Tab-Sleuth, an assistant answering questions about the user's active browser tab.",
     styleRule,
     'Inspect BOTH the scanned DOM text and ALL attached full-page screenshots and embedded passage/chart/diagram images together (or PDFs).',
     'When the answer relies on facts from the page or screen, cite or quote the relevant part concisely.',

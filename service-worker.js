@@ -19,13 +19,13 @@ function registerContextMenus() {
 
     chrome.contextMenus.create({
       id: MENU_ASK_SELECTION,
-      title: 'Ask TabScan Q&A about "%s"',
+      title: 'Ask Tab-Sleuth about "%s"',
       contexts: ['selection'],
     });
 
     chrome.contextMenus.create({
       id: MENU_SCAN_PAGE,
-      title: 'Scan & answer this tab with TabScan Q&A',
+      title: 'Scan & answer this tab with Tab-Sleuth',
       contexts: ['page'],
     });
   });

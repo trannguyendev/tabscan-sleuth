@@ -2951,7 +2951,7 @@ test('update-checker parses semver and detects newer versions correctly', async 
 
   assert.equal(result.hasUpdate, true);
   assert.equal(result.latestVersion, 'v1.0.2');
-  assert.ok(result.downloadUrl.includes('tab-scan-qa.zip'));
+  assert.ok(result.downloadUrl.includes('tab-sleuth.zip'));
   assert.ok(result.updaterBatUrl.includes('update.bat'));
 });
 

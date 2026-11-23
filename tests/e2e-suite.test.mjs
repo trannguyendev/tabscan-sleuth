@@ -1,5 +1,5 @@
 /**
- * TabScan Q&A MV3 Extension - Comprehensive 4-Tier Automated E2E Test Suite
+ * Tab-Sleuth MV3 Extension - Comprehensive 4-Tier Automated E2E Test Suite
  *
  * Tier 1 — Feature Coverage (48 tests across 8 core features)
  * Tier 2 — Boundary & Corner Cases (48 tests across 8 core features)
@@ -467,7 +467,7 @@ describe('Tier 1 — Feature Coverage', () => {
     it('T1_F4_01: manifest conforms to Chrome MV3 side panel architecture', async () => {
       const manifest = await getManifest();
       assert.strictEqual(manifest.manifest_version, 3);
-      assert.strictEqual(manifest.name, 'TabScan Q&A');
+      assert.strictEqual(manifest.name, 'Tab-Sleuth');
       assert.ok(manifest.version);
       assert.ok(manifest.side_panel?.default_path);
     });
@@ -596,7 +596,7 @@ describe('Tier 1 — Feature Coverage', () => {
     it('T1_F6_01: Omaha XML root element has protocol 2.0 and update2 namespace', () => {
       const xml = generateUpdateXml({
         appId: 'jjoepgfpagdecpcbabppbbnblaeklpic',
-        codebase: 'https://example.com/tab-scan-qa.crx',
+        codebase: 'https://example.com/tab-sleuth.crx',
         version: '1.0.0',
       });
 
@@ -617,7 +617,7 @@ describe('Tier 1 — Feature Coverage', () => {
     });
 
     it('T1_F6_03: Omaha XML updatecheck codebase attribute points to hosted .crx', () => {
-      const codebase = 'https://raw.githubusercontent.com/user/repo/main/dist/tab-scan-qa.crx';
+      const codebase = 'https://raw.githubusercontent.com/user/repo/main/dist/tab-sleuth.crx';
       const xml = generateUpdateXml({
         appId: 'jjoepgfpagdecpcbabppbbnblaeklpic',
         codebase,
@@ -1663,7 +1663,7 @@ describe('Tier 3 — Cross-Feature Combinations', () => {
 
     const xml = generateUpdateXml({
       appId,
-      codebase: manifest.update_url.replace('/updates.xml', '/tab-scan-qa.crx'),
+      codebase: manifest.update_url.replace('/updates.xml', '/tab-sleuth.crx'),
       version: manifest.version,
     });
 
@@ -1809,7 +1809,7 @@ describe('Tier 3 — Cross-Feature Combinations', () => {
 
     const xml = generateUpdateXml({
       appId,
-      codebase: 'https://example.com/tab-scan-qa.crx',
+      codebase: 'https://example.com/tab-sleuth.crx',
       version: manifest.version,
     });
 
@@ -2050,7 +2050,7 @@ describe('Tier 4 — Real-World Application Scenarios', () => {
 
     const xml = generateUpdateXml({
       appId,
-      codebase: 'https://raw.githubusercontent.com/user/tabscan-qa/main/dist/tab-scan-qa.crx',
+      codebase: 'https://raw.githubusercontent.com/user/tabscan-sleuth/main/dist/tab-sleuth.crx',
       version: manifest.version,
     });
 

@@ -1,9 +1,9 @@
 @echo off
 setlocal EnableDelayedExpansion
-title TabScan Q^&A - Release Publisher
+title Tab-Sleuth - Release Publisher
 cls
 echo ==============================================================================
-echo   TabScan Q^&A - Automated GitHub Release Publisher
+echo   Tab-Sleuth - Automated GitHub Release Publisher
 echo ==============================================================================
 echo.
 
@@ -39,7 +39,7 @@ echo Packaging release %TAG%...
 echo ==============================================================================
 
 :: 2. Run packaging script
-node scripts/package-release.mjs --key=key.pem --version=%NEW_VER% --update-url="https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml" --codebase-url="https://github.com/trannguyendev/tabscan-sleuth/releases/download/%TAG%/tab-scan-qa.crx"
+node scripts/package-release.mjs --key=key.pem --version=%NEW_VER% --update-url="https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml" --codebase-url="https://github.com/trannguyendev/tabscan-sleuth/releases/download/%TAG%/tab-sleuth.crx"
 if %errorlevel% neq 0 (
     echo.
     echo [ERROR] Packaging failed!
@@ -63,8 +63,8 @@ echo Publishing %TAG% to GitHub Releases with all assets...
 "C:\Program Files\GitHub CLI\gh.exe" release create %TAG% ^
   "Install-TabSleuth.bat#Install-TabSleuth.bat" ^
   "update.bat#update.bat" ^
-  "dist/tab-scan-qa.zip#tab-scan-qa.zip" ^
-  "dist/tab-scan-qa.crx#tab-scan-qa.crx" ^
+  "dist/tab-sleuth.zip#tab-sleuth.zip" ^
+  "dist/tab-sleuth.crx#tab-sleuth.crx" ^
   --repo trannguyendev/tabscan-sleuth ^
   --title "%TAG% - Tab-Sleuth Release" ^
   --generate-notes
@@ -79,8 +79,8 @@ echo.
 echo   Uploaded assets:
 echo     1. Install-TabSleuth.bat  - 1-Click Installer for new users
 echo     2. update.bat             - 1-Click Updater for existing users
-echo     3. tab-scan-qa.zip        - Unpacked source package
-echo     4. tab-scan-qa.crx        - Signed Chrome extension
+echo     3. tab-sleuth.zip         - Unpacked source package
+echo     4. tab-sleuth.crx         - Signed Chrome extension
 echo.
 echo   View release at:
 echo     https://github.com/trannguyendev/tabscan-sleuth/releases/tag/%TAG%

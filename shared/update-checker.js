@@ -82,7 +82,7 @@ export async function checkGitHubRelease(options = {}) {
       releaseName: data.name || remoteTag,
       releaseUrl: data.html_url || `https://github.com/${repo}/releases/latest`,
       releaseBody: data.body || '',
-      downloadUrl: `https://github.com/${repo}/releases/latest/download/tab-scan-qa.zip`,
+      downloadUrl: `https://github.com/${repo}/releases/latest/download/tab-sleuth.zip`,
       updaterBatUrl: `https://raw.githubusercontent.com/${repo}/main/update.bat`,
       checkedAt: Date.now(),
     };

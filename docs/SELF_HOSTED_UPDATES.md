@@ -1,6 +1,6 @@
 # Self-Hosted Auto-Update Pipeline & CRX3 Deployment Guide
 
-This guide details the architecture, packaging pipeline, distribution workflow, and enterprise deployment strategies for self-hosting the **TabScan Q&A** Chrome Manifest V3 extension. By using Google's native Omaha v2.0 protocol and cryptographically signed CRX3 packages, updates are delivered automatically and silently to existing installs without dependency on the Chrome Web Store or paying developer registration fees.
+This guide details the architecture, packaging pipeline, distribution workflow, and enterprise deployment strategies for self-hosting the **Tab-Sleuth** Chrome Manifest V3 extension. By using Google's native Omaha v2.0 protocol and cryptographically signed CRX3 packages, updates are delivered automatically and silently to existing installs without dependency on the Chrome Web Store or paying developer registration fees.
 
 ---
 
@@ -13,7 +13,7 @@ Chromium-based browsers (Google Chrome, Microsoft Edge, Brave, Opera) check for 
 1. **Update Manifest Registration**:
    `manifest.json` specifies the remote update endpoint:
    ```json
-   "update_url": "https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
+   "update_url": "https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml"
    ```
 
 2. **Polling Mechanism**:
@@ -32,7 +32,7 @@ Chromium-based browsers (Google Chrome, Microsoft Edge, Brave, Opera) check for 
    <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
      <app appid='jjoepgfpagdecpcbabppbbnblaeklpic'>
        <updatecheck
-         codebase='https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/tab-scan-qa.crx'
+         codebase='https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/tab-sleuth.crx'
          version='1.0.1'
          prodversionmin='116.0.0.0' />
      </app>
@@ -57,10 +57,10 @@ To ensure the extension App ID remains **100% stable** across developer unpacked
 ```json
 {
   "manifest_version": 3,
-  "name": "TabScan Q&A",
+  "name": "Tab-Sleuth",
   "version": "1.0.0",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...",
-  "update_url": "https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
+  "update_url": "https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml"
 }
 ```
 
@@ -112,26 +112,26 @@ node scripts/package-release.mjs
 |---|---|---|
 | `--key=<path>` | Path to RSA 2048 private key PEM | `key.pem` (auto-generated if missing) |
 | `--out=<dir>` | Output directory for release artifacts | `dist/` |
-| `--update-url=<url>` | URL to remote `updates.xml` | `https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml` |
-| `--codebase-url=<url>` | Download URL to remote `.crx` file | `https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/tab-scan-qa.crx` |
+| `--update-url=<url>` | URL to remote `updates.xml` | `https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml` |
+| `--codebase-url=<url>` | Download URL to remote `.crx` file | `https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/tab-sleuth.crx` |
 | `--version=<ver>` | Version string override | Reads `"version"` from `manifest.json` |
 | `-h, --help` | Display usage instructions | — |
 
 #### Example Invocation with Custom Hosting
 ```bash
 node scripts/package-release.mjs \
-  --key=secrets/tabscan-release.pem \
+  --key=secrets/tabsleuth-release.pem \
   --out=dist \
-  --update-url=https://cdn.example.com/tabscan/updates.xml \
-  --codebase-url=https://cdn.example.com/tabscan/tab-scan-qa-1.0.0.crx
+  --update-url=https://cdn.example.com/tabsleuth/updates.xml \
+  --codebase-url=https://cdn.example.com/tabsleuth/tab-sleuth-1.0.0.crx
 ```
 
 ### 2.2 Generated Artifacts
 
 Executing the script creates four production artifacts in `dist/`:
 
-1. **`dist/tab-scan-qa.crx`**: Cryptographically signed CRX3 package ready for download and browser installation.
-2. **`dist/tab-scan-qa.zip`**: Clean ZIP archive containing all extension assets, excluding development artifacts (tests, docs, keys).
+1. **`dist/tab-sleuth.crx`**: Cryptographically signed CRX3 package ready for download and browser installation.
+2. **`dist/tab-sleuth.zip`**: Clean ZIP archive containing all extension assets, excluding development artifacts (tests, docs, keys).
 3. **`dist/updates.xml`**: Omaha v2.0 update manifest referencing the generated App ID, version, and codebase URL.
 4. **`dist/release-metadata.json`**: Audit ledger with version, App ID, SHA-256 hash, byte counts, and packaged file list.
 
@@ -184,7 +184,7 @@ For individual users installing outside the Chrome Web Store without domain ente
 ### Step-by-Step Installation
 
 1. **Download the CRX Package**:
-   Download `tab-scan-qa.crx` from the project's release page.
+   Download `tab-sleuth.crx` from the project's release page.
 
 2. **Open Extension Management**:
    Navigate to `chrome://extensions` (or `edge://extensions` on Microsoft Edge) in the browser address bar.
@@ -193,10 +193,10 @@ For individual users installing outside the Chrome Web Store without domain ente
    Toggle the **Developer mode** switch in the top-right corner to **ON**.
 
 4. **Drag and Drop**:
-   Drag the downloaded `tab-scan-qa.crx` file directly from your file manager onto the `chrome://extensions` window.
+   Drag the downloaded `tab-sleuth.crx` file directly from your file manager onto the `chrome://extensions` window.
 
 5. **Confirm Installation**:
-   When prompted with *"Add TabScan Q&A? It can read and change your data on all websites"*, click **Add extension**.
+   When prompted with *"Add Tab-Sleuth? It can read and change your data on all websites"*, click **Add extension**.
 
 6. **Automatic Background Updates**:
    Once installed via drag-and-drop, Chrome registers the extension with its embedded `update_url`. The browser will automatically check `updates.xml`, download newer versions, and apply them in the background without requiring future manual drag-and-drop actions.
@@ -205,7 +205,7 @@ For individual users installing outside the Chrome Web Store without domain ente
 
 ## 4. Enterprise Deployment & Silent Auto-Update
 
-Enterprise administrators can silently deploy TabScan Q&A to managed machines and force automated background updates with zero user interaction.
+Enterprise administrators can silently deploy Tab-Sleuth to managed machines and force automated background updates with zero user interaction.
 
 ### 4.1 Windows Deployment (Group Policy & Registry)
 
@@ -226,7 +226,7 @@ Open PowerShell as Administrator:
 
 ```powershell
 $AppId = "jjoepgfpagdecpcbabppbbnblaeklpic"
-$UpdateUrl = "https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
+$UpdateUrl = "https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml"
 $RegPath = "HKLM:\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist"
 
 if (!(Test-Path $RegPath)) {
@@ -235,14 +235,14 @@ if (!(Test-Path $RegPath)) {
 
 # The registry value name is an incremental integer (1, 2, 3...)
 Set-ItemProperty -Path $RegPath -Name "1" -Value "$AppId;$UpdateUrl"
-Write-Host "TabScan Q&A force-install policy registered successfully."
+Write-Host "Tab-Sleuth force-install policy registered successfully."
 ```
 
 #### Immediate Policy Verification
 1. Navigate to `chrome://policy`.
 2. Click **Reload policies**.
 3. Confirm `ExtensionInstallForcelist` appears with Status **OK**.
-4. Navigate to `chrome://extensions`. TabScan Q&A is installed and managed by policy.
+4. Navigate to `chrome://extensions`. Tab-Sleuth is installed and managed by policy.
 
 ---
 
@@ -260,7 +260,7 @@ Create or update `/Library/Managed Preferences/com.google.Chrome.plist`:
 <dict>
   <key>ExtensionInstallForcelist</key>
   <array>
-    <string>jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml</string>
+    <string>jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml</string>
   </array>
 </dict>
 </plist>
@@ -273,19 +273,19 @@ Create or update `/Library/Managed Preferences/com.google.Chrome.plist`:
 On Linux distributions (Debian, Ubuntu, Fedora, RHEL), managed policies are stored in JSON configuration files.
 
 #### Configuration Path
-Create `/etc/opt/chrome/policies/managed/tabscan.json`:
+Create `/etc/opt/chrome/policies/managed/tabsleuth.json`:
 
 ```json
 {
   "ExtensionInstallForcelist": [
-    "jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/trannguyendev/tabscan-qa/main/dist/updates.xml"
+    "jjoepgfpagdecpcbabppbbnblaeklpic;https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/dist/updates.xml"
   ]
 }
 ```
 
 Set file permissions:
 ```bash
-sudo chmod 644 /etc/opt/chrome/policies/managed/tabscan.json
+sudo chmod 644 /etc/opt/chrome/policies/managed/tabsleuth.json
 ```
 
 ---
@@ -305,19 +305,19 @@ GitHub Pages and GitHub Releases provide reliable, high-availability, zero-cost 
    ```
 
 3. **Push Artifacts**:
-   Commit the generated `dist/` artifacts (`tab-scan-qa.crx` and `updates.xml`) and push to your GitHub repository:
+   Commit the generated `dist/` artifacts (`tab-sleuth.crx` and `updates.xml`) and push to your GitHub repository:
    ```bash
    git add manifest.json dist/
-   git commit -m "chore(release): package TabScan Q&A v1.0.1"
+   git commit -m "chore(release): package Tab-Sleuth v1.0.1"
    git push origin main
    ```
 
 4. **GitHub Releases Hosting (Alternative)**:
    If hosting files as GitHub Release assets:
    - Tag the release: `git tag v1.0.1 && git push origin v1.0.1`
-   - Create a GitHub Release and upload `dist/tab-scan-qa.crx`.
+   - Create a GitHub Release and upload `dist/tab-sleuth.crx`.
    - Update `updates.xml` codebase URL to point to the GitHub Release download URL:
-     `https://github.com/trannguyendev/tabscan-qa/releases/download/v1.0.1/tab-scan-qa.crx`
+     `https://github.com/trannguyendev/tabscan-sleuth/releases/download/v1.0.1/tab-sleuth.crx`
 
 ---
 

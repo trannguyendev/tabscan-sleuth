@@ -2774,6 +2774,6 @@ async function init() {
 }
 
 init().catch((err) => {
-  console.error('Failed to initialize TabScan Q&A side panel:', err);
+  console.error('Failed to initialize Tab-Sleuth side panel:', err);
   setStatusBadge('error', '⚠', 'Init error');
 });

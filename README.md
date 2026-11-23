@@ -1,50 +1,155 @@
-# TabScan Q&A — Chrome Manifest V3 Side Panel Extension
+# 🕵️‍♂️ Tab-Sleuth
 
-[![Chrome MV3](https://img.shields.io/badge/Chrome-MV3%20Side%20Panel-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/manifest)
-[![Automated Tests](https://img.shields.io/badge/Tests-157%20Passing%20(0%20Failures)-success)](#testing--quality-assurance)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0%20(Pure%20Vanilla%20%2B%20Node%20Native)-blueviolet)](#project-overview--architecture)
-[![CRX3 Packaging](https://img.shields.io/badge/Packaging-Signed%20CRX3%20%2B%20Omaha%20v2.0-blue)](#distribution--packaging-pipeline)
-[![Dual AI Provider](https://img.shields.io/badge/AI%20Providers-Gemini%20Interactions%20%2B%20Claude-orange)](#dual-ai-provider-support)
+> **Your AI study buddy and quiz assistant — right inside Google Chrome's side panel.**
 
-**TabScan Q&A** is a production-grade Google Chrome Manifest V3 Side Panel extension that automatically scans the active browser tab, extracts and structures questions (quizzes, exercises, forms, FAQs, coding challenges), streams grounded AI answers using the **Google Gemini Interactions API** or **Anthropic Claude Messages API**, and interacts directly with page elements (highlighting answers, auto-filling inputs, solving drag-and-drop exercises, and matching cards).
-
-Built with **zero third-party dependencies**, TabScan Q&A combines extreme runtime efficiency with an intelligent multi-tier cache (0ms replay), DOM token optimization, seamless container-query responsiveness (320px–800px), out-of-token rate limit auto-wait, and a cryptographically signed self-hosted CRX3 release pipeline.
-
----
-
-## Table of Contents
-
-1. [Project Overview & Architecture](#project-overview--architecture)
-2. [Key Features](#key-features)
-   - [Smart Context Pruning & Token Optimization](#smart-context-pruning--token-optimization)
-   - [Multi-Tier Intelligent Query Caching](#multi-tier-intelligent-query-caching)
-   - [Progressive Response Streaming & Pulsing Cursor](#progressive-response-streaming--pulsing-cursor)
-   - [Dual AI Provider Support (Gemini & Claude)](#dual-ai-provider-support)
-   - [Rate-Limit Auto-Wait & Countdown Resume (F15)](#rate-limit-auto-wait--countdown-resume-f15)
-   - [Advanced In-Page Exercise Interactions](#advanced-in-page-exercise-interactions)
-   - [Modern Responsive UI/UX with Container Queries](#modern-responsive-uiux-with-container-queries)
-3. [Project File Layout](#project-file-layout)
-4. [Installation & Getting Started](#installation--getting-started)
-   - [Option A: Load as Unpacked Extension](#option-a-load-as-unpacked-extension-developer-mode)
-   - [Option B: Install Packaged CRX3 File](#option-b-install-packaged-crx3-file)
-   - [Configuration & API Keys](#configuration--api-keys)
-5. [Distribution & Packaging Pipeline](#distribution--packaging-pipeline)
-   - [Zero-Dependency CRX3 Packaging Script](#zero-dependency-crx3-packaging-script)
-   - [Distribution Artifacts](#distribution-artifacts)
-   - [Self-Hosted & Enterprise Auto-Updates](#self-hosted--enterprise-auto-updates)
-6. [Testing & Quality Assurance](#testing--quality-assurance)
-   - [157 Automated Tests](#157-automated-tests)
-   - [Test Tier Architecture](#test-tier-architecture)
-   - [Running the Test Suites](#running-the-test-suites)
-7. [Security & Compliance](#security--compliance)
+[![Chrome Extension MV3](https://img.shields.io/badge/Chrome-Extension%20MV3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/reference/manifest)
+[![Version](https://img.shields.io/badge/version-v1.0.1-blue.svg?style=flat-square)](manifest.json)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
+[![Tests Passing](https://img.shields.io/badge/tests-158%20passing-brightgreen.svg?style=flat-square)](#-developer--technical-guide)
+[![Status](https://img.shields.io/badge/status-active%20release-success.svg?style=flat-square)](https://github.com/trannguyendev/tabscan-sleuth/releases)
+[![Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Vanilla)-blueviolet.svg?style=flat-square)](#-developer--technical-guide)
 
 ---
 
-## Project Overview & Architecture
+## 🌟 What is Tab-Sleuth?
 
-TabScan Q&A is designed around Chrome's modern Manifest V3 side panel paradigm (`chrome.sidePanel`, Chrome 116+), ensuring persistent, non-intrusive access alongside any browsing session.
+Have you ever worked on an online quiz, practice exam, homework assignment, or reading comprehension test and wished you had an intelligent helper right beside your page?
 
-```
+**Tab-Sleuth** is a smart, friendly Chrome extension that sits neatly in your browser's **Side Panel**. With a single click, it scans your current webpage, spots questions or exercises, and gives you clear, step-by-step explanations powered by Google Gemini or Anthropic Claude — **without ever leaving your tab or switching windows!**
+
+### ✨ Why You'll Love It:
+
+- 🔍 **One-Click Page Scanner**: Instantly discovers multiple-choice questions, fill-in-the-blanks, matching exercises, and reading comprehension passages.
+- 💡 **Side-by-Side Explanations**: Answers and helpful reasoning stream live in a sidebar right next to your work.
+- 🎯 **Visual Highlights**: Highlights key evidence and correct answers directly on the webpage so you can follow along easily.
+- ✍️ **Safe In-Page Selection**: Can fill in multiple-choice choices or blanks for you. **Safety Guarantee**: Tab-Sleuth *never* clicks "Submit" or finishes exams for you — you stay in 100% control!
+- ⚡ **Lightning Fast (0ms Replay)**: Automatically remembers questions you have already asked. Re-asking gives an instant answer with zero waiting and zero wasted AI quota.
+- ⏳ **Smart Rate-Limit Auto-Wait**: If you ever hit a free API rate limit, Tab-Sleuth displays a live countdown timer and automatically resumes your answer when the countdown hits zero!
+- 🔒 **100% Private & Direct**: There are no tracking servers or third-party databases. All requests go directly from your browser to Google or Anthropic using your own free API key.
+
+---
+
+## 🚀 3-Step Quick Install Guide
+
+Installing Tab-Sleuth takes less than 60 seconds on any Windows PC. No coding or developer tools required!
+
+### Step 1: Download the 1-Click Installer
+Click below to download the official installer helper:
+
+👉 **[📥 Download Install-TabSleuth.bat](https://github.com/trannguyendev/tabscan-sleuth/releases/latest/download/Install-TabSleuth.bat)**
+
+*(Or download it from the [Latest GitHub Release](https://github.com/trannguyendev/tabscan-sleuth/releases/latest)).*
+
+---
+
+### Step 2: Double-Click `Install-TabSleuth.bat`
+1. Open your Downloads folder and double-click **`Install-TabSleuth.bat`**.
+2. *Windows SmartScreen Note*: If Windows shows a blue popup saying *"Windows protected your PC"*, simply click **"More info"** and then **"Run anyway"**.
+3. **What happens automatically**:
+   - Tab-Sleuth downloads and unpacks safely into your personal app folder (`%LOCALAPPDATA%\TabSleuth`).
+   - The exact folder path is **automatically copied to your clipboard**.
+   - An **"Update Tab-Sleuth"** shortcut is placed on your Desktop for easy 1-click updates.
+   - Google Chrome opens automatically to your extensions page (`chrome://extensions`).
+
+---
+
+### Step 3: Load into Chrome (Takes 10 Seconds)
+In the Chrome tab that just opened:
+1. Turn **ON** the switch called **"Developer mode"** in the top-right corner.
+2. Click the **"Load unpacked"** button in the top-left toolbar.
+3. In the folder selection window, click inside the folder path box, press **`Ctrl + V`** (to paste the path that was copied for you), and press **Enter** (or click **"Select Folder"**).
+
+🎉 **You're all set!** Click the puzzle piece icon (🧩) next to your browser's address bar and click the pin icon next to **Tab-Sleuth** to keep it handy!
+
+---
+
+### 🔑 1-Minute Setup: Add Your Free AI Key
+
+Tab-Sleuth uses Google's official Gemini AI, which is completely free for personal use:
+
+1. Click the **Tab-Sleuth** icon in your Chrome toolbar to open the Side Panel.
+2. Click the **⚙️ Settings** gear icon in the top header.
+3. Get a 100% free API key from **[Google AI Studio](https://aistudio.google.com/)** *(click "Create API key" — no credit card needed)*.
+4. Paste your key into Tab-Sleuth, click **Test key** to confirm it works, and click **Save settings**.
+*(Prefer Claude? You can enter your Anthropic Claude API key in settings as well!)*
+
+---
+
+### 🔄 How to Update in the Future
+
+Whenever an update is available:
+1. An **"Update available"** badge will light up inside the extension.
+2. Double-click the **"Update Tab-Sleuth"** shortcut on your Desktop.
+3. Click the reload (🔄) button next to Tab-Sleuth in `chrome://extensions` (or restart Chrome). Done!
+
+---
+
+## ❓ Frequently Asked Questions (FAQ)
+
+<details>
+<summary><b>Is Tab-Sleuth completely free?</b></summary>
+<br>
+Yes! Tab-Sleuth is 100% free and open-source software released under the MIT license. Google Gemini also provides a generous free tier for personal API usage that costs $0.
+</details>
+
+<details>
+<summary><b>Does Tab-Sleuth send my browsing data or passwords anywhere?</b></summary>
+<br>
+<b>No.</b> Tab-Sleuth operates entirely within your browser. There is no middleman backend server, tracking script, or telemetry database. When you click scan or ask a question, the request is sent directly from your Chrome browser to Google (or Anthropic) over an encrypted HTTPS connection using your private API key.
+</details>
+
+<details>
+<summary><b>What browser permissions does Tab-Sleuth need and why?</b></summary>
+<br>
+Tab-Sleuth requests only the minimal permissions required to function:
+- <b>Side Panel</b>: To display the question helper in Chrome's native sidebar.
+- <b>Active Tab & Scripting</b>: To detect questions on the page when you ask it to scan, and to highlight relevant answers. It only inspects a page when you initiate an action.
+- <b>Storage</b>: To remember your settings and store recent question answers locally on your computer so it doesn't waste your AI quota answering identical questions twice.
+</details>
+
+<details>
+<summary><b>Will Tab-Sleuth automatically submit my quiz or exam?</b></summary>
+<br>
+<b>No, never.</b> Tab-Sleuth contains a hardcoded safety lock in its page automation script that strictly blocks clicks on submit buttons or form submission triggers. You remain entirely in control of reviewing and submitting your own work.
+</details>
+
+<details>
+<summary><b>What happens if I hit the AI rate limit?</b></summary>
+<br>
+Free API keys have brief hourly or per-minute rate limits. If you ever hit one, Tab-Sleuth automatically detects the rate-limit reset time, shows a friendly live countdown timer in the sidebar, and resumes your streaming answer the moment the limit clears!
+</details>
+
+<details>
+<summary><b>Can I use Anthropic Claude instead of Google Gemini?</b></summary>
+<br>
+Yes! In the Settings panel, choose any supported Claude model (such as <code>claude-3-5-sonnet</code>), enter your Anthropic API key, and Tab-Sleuth will seamlessly route all requests through Claude's streaming API.
+</details>
+
+<details>
+<summary><b>Why do I need to turn on "Developer mode" in Chrome?</b></summary>
+<br>
+Because Tab-Sleuth is distributed directly from its open-source GitHub repository rather than the Chrome Web Store. Turning on Developer mode simply allows Chrome to load extensions directly from a local folder on your computer.
+</details>
+
+<details>
+<summary><b>How do I uninstall Tab-Sleuth?</b></summary>
+<br>
+Go to <code>chrome://extensions</code>, find Tab-Sleuth, and click <b>Remove</b>. You can also delete the <code>%LOCALAPPDATA%\TabSleuth</code> folder and the Desktop shortcut at any time.
+</details>
+
+---
+
+## 🛠️ Developer & Technical Guide
+
+<details>
+<summary><b>Click to expand architecture, packaging pipeline, and test suite details</b></summary>
+<br>
+
+### Architecture Overview
+
+Tab-Sleuth is engineered strictly around Chrome's modern Manifest V3 side panel architecture (`chrome.sidePanel`, Chrome 116+) with zero runtime dependencies.
+
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                            ACTIVE BROWSER TAB                               │
 │  ┌───────────────────────────────┐  ┌────────────────────────────────────┐  │
@@ -55,10 +160,10 @@ TabScan Q&A is designed around Chrome's modern Manifest V3 side panel paradigm (
 │       chrome.scripting.executeScript│   └─────────────────▲──────────────┘  │
 │                  ▼                                        │                 │
 │        scripts/page-scanner.js ───────────────────────────┤                 │
-│        - DOM extraction, question detection               │                 │
-│        - Visible / iframe content inventory               │ Apply /         │
-└──────────────────┬────────────────────────────────────────┼─ Highlight ─────┘
-                   │ Extracted DOM / Text                   │ Actions
+│        - DOM extraction, question detection               │ Apply /         │
+│        - Visible / iframe content inventory               │ Highlight       │
+└──────────────────┬────────────────────────────────────────┼─ Actions ───────┘
+                   │ Extracted DOM / Text                   │
                    ▼                                        │
 ┌───────────────────────────────────────────────────────────┴─────────────────┐
 │                     CHROME MV3 SIDE PANEL (sidepanel/)                      │
@@ -83,7 +188,7 @@ TabScan Q&A is designed around Chrome's modern Manifest V3 side panel paradigm (
 │  │ shared/gemini-client.js (Streaming AI Client)                         │  │
 │  │ - Gemini Interactions API (v1beta/interactions)                       │  │
 │  │ - Anthropic Claude Messages API (v1/messages)                         │  │
-│  │ - F15 Rate-Limit Auto-Wait & Countdown Resume (429 / 529 retry-after) │  │
+│  │ - Rate-Limit Auto-Wait & Countdown Resume (429 / 529 retry-after)     │  │
 │  └───────────────────┬───────────────────────────────────────────────────┘  │
 │                      ▼ Server-Sent Events (SSE) Stream                      │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
@@ -95,304 +200,73 @@ TabScan Q&A is designed around Chrome's modern Manifest V3 side panel paradigm (
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Architectural Principles
+### Core Technical Innovations
 
-1. **Zero External Dependencies**: Implemented entirely in vanilla modern JavaScript (ES2022+) and CSS3 without frameworks, bundlers, or third-party npm runtime libraries.
-2. **Strict Manifest V3 Security**: No `eval()`, no remote script execution, no `new Function()`, and strictly zero `innerHTML` usage. All dynamic HTML is constructed via DOM APIs (`createElement`, `textContent`, `setAttribute`).
-3. **Deterministic App Identity**: The extension's 32-character Chromium App ID (`jjoepgfpagdecpcbabppbbnblaeklpic`) is mathematically bound to its RSA-2048 public key pinned directly in `manifest.json`.
+1. **Zero External Dependencies**: Implemented in 100% pure vanilla modern JavaScript (ES2022+) and CSS3 without frameworks, bundlers, or third-party npm libraries.
+2. **Strict Manifest V3 Security**: Zero `eval()`, zero remote script loading, zero `new Function()`, and strictly zero `innerHTML`. All DOM construction uses safe APIs (`createElement`, `textContent`, `setAttribute`).
+3. **Smart Token Pruning**: Strips boilerplate elements (`nav`, `footer`, ads, cookie banners) while strictly preserving inputs, quizzes, and forms; truncates at paragraph/sentence boundaries.
+4. **Two-Tier Query Cache**: High-speed Tier 1 In-Memory Map (0ms replay) backed by Tier 2 `chrome.storage.local` with deterministic SHA-256 keys and LRU eviction.
+5. **Rate-Limit Auto-Wait & Resume**: Parses `retry-after` and `x-ratelimit-reset-*` headers, mounts a real-time countdown banner in the UI, and automatically resubmits pending queries once the limit clears.
 
----
+### Project Layout
 
-## Key Features
-
-### Smart Context Pruning & Token Optimization
-*Location: `shared/token-optimizer.js`*
-
-Web pages contain massive amounts of noisy navigation chrome, footers, tracking scripts, and cookie banners that inflate LLM prompt tokens and trigger quota limits. TabScan Q&A introduces an intelligent multi-stage token optimizer:
-- **Boilerplate Selector Stripping**: Safely removes `nav`, `footer`, `aside`, `.ad`, `[role="banner"]`, `[role="contentinfo"]`, and `.cookie-banner` elements while strictly preserving inputs, quizzes, and forms.
-- **Whitespace Collapsing**: Eliminates repetitive indentation, tabs, and excess newlines while preserving markdown-friendly structural spacing.
-- **Semantic Boundary Truncation**: When page text exceeds token thresholds, truncation cuts cleanly at the nearest paragraph boundary (`\n\n`), falling back gracefully to sentence boundaries (`. `, `! `, `? `). Context is never cut mid-word or mid-sentence.
-- **Selective Screenshot Attachment**: Text-only Q&A queries bypass costly multi-tile full-page screenshots, saving up to 80% of multimodal tokens. Viewport screenshots are attached only when visual diagrams, canvas, or explicit image elements are present.
-
-### Multi-Tier Intelligent Query Caching
-*Location: `shared/cache-manager.js`*
-
-TabScan Q&A features an intelligent two-tier caching engine that eliminates redundant API calls:
-- **Deterministic Cache Keys**: Computes a 32-character SHA-256 digest of `(contentHash + query + model + answerStyle)`.
-- **Tier 1 (In-Memory Map)**: High-speed volatile cache that answers identical queries within the same session in **0ms** without touching disk storage.
-- **Tier 2 (Chrome Local Storage)**: Persistent storage using `chrome.storage.local` with automatic promotion to Tier 1 on cache read.
-- **LRU Eviction & Budgeting**: Strict limit of 150 cached entries or 4 MB of storage, automatically purging the least recently used entries.
-- **Visual Feedback**: Cached answers are instantly badged in the UI with a subtle emerald `⚡ Cached (0ms)` indicator.
-
-### Progressive Response Streaming & Pulsing Cursor
-*Location: `shared/gemini-client.js`, `sidepanel/sidepanel.js`, `sidepanel/sidepanel.css`*
-
-- **Low-Latency SSE Streaming**: Parses Server-Sent Events in real time, rendering incremental text tokens into the side panel as they arrive from the model.
-- **Animated Pulsing Streaming Cursor**: An animated cursor (`.streaming-cursor`) pulses alongside streaming markdown output to provide clear visual progress.
-- **WCAG Accessibility Compliance**: Fully respects `prefers-reduced-motion: reduce` by replacing animations with a steady high-contrast cursor.
-- **Safe Markdown Rendering**: Employs `shared/markdown.js` to render headings, bold/italic text, lists, and syntax-highlighted code blocks with copy-to-clipboard buttons without touching `innerHTML`.
-
-### Dual AI Provider Support
-*Location: `shared/gemini-client.js`, `shared/constants.js`*
-
-Choose your preferred AI intelligence engine:
-- **Google Gemini**: Uses the modern `v1beta/interactions` REST & SSE API with full support for:
-  - `gemini-3.8-flash` (default, high-speed & cost-effective)
-  - `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`
-  - `gemini-4-argon` and custom Gemini model IDs
-  - Multimodal inline image attachments (data URLs)
-- **Anthropic Claude**: Full compatibility with the Claude Messages API (`v1/messages`):
-  - `claude-3-5-sonnet-20241022`
-  - `claude-3-5-haiku-20241022`
-  - Automatic SSE chunk mapping (`content_block_delta` -> streaming text)
-- **Dynamic Provider Routing**: Automatic detection based on model name prefix, with isolated API key management and connection testing for both providers.
-
-### Rate-Limit Auto-Wait & Countdown Resume (F15)
-*Location: `shared/gemini-client.js`, `sidepanel/sidepanel.js`*
-
-When working with free-tier API quotas, hitting rate limits (HTTP 429 / 529 / `RESOURCE_EXHAUSTED`) is a common frustration. TabScan Q&A handles this autonomously:
-- **Header Inspection**: Accurately parses `retry-after` (seconds or HTTP date) or rate-limit reset headers (`x-ratelimit-reset-*`).
-- **Exponential Backoff Fallback**: Employs randomized exponential backoff with jitter if headers are absent.
-- **Side-Panel Countdown Card**: Mounts a live countdown banner (`.rate-limit-card`) informing the user of the exact seconds remaining before retry.
-- **Automatic Resume**: When the countdown completes, the pending query automatically retries and resumes streaming without requiring the user to re-type or click anything.
-
-### Advanced In-Page Exercise Interactions
-*Location: `scripts/page-actions.js`, `scripts/page-scanner.js`*
-
-TabScan Q&A does not merely answer questions; it can interact with the page to solve them:
-- **Highlighter**: Uses the modern `CSS.highlights` API (with a seamless `<mark>` fallback) to visually highlight answers and quotes in the host page.
-- **Safe Form Apply**: Fills radio buttons, multi-select checkboxes, ARIA radio groups, `<select>` dropdowns, and text fields (`<input>`, `<textarea>`, `contenteditable`). **Strict safety guarantee**: It never clicks submit buttons or triggers unauthorized form posts.
-- **Drag-and-Drop Cloze Exercises**: Solves word-bank fill-in-the-blank exercises by generating authentic Mouse/Pointer events (and HTML5 DragEvent/DataTransfer fallbacks) across multiple blanks inside shared sentences.
-- **Category Column Sorting**: Resolves multi-column categorization exercises (e.g., sorting philosophical claims between Plato and Epicurus) by dragging items into designated dropzones.
-- **Matching Cards**: Solves memory and definition matching exercises by clicking left-to-right paired cards in sequence.
-- **Multi-Frame Support**: Seamlessly traverses and aggregates exercises across child `<iframe>` elements.
-
-### Modern Responsive UI/UX with Container Queries
-*Location: `sidepanel/sidepanel.css`, `sidepanel/sidepanel.html`*
-
-- **CSS Container Queries (`@container (min-width: 480px)`)**: Adapts cleanly from compact narrow panels (320px) to expanded desktop widths (800px).
-- **Elevated Slate/Zinc Theme**: Clean neutral color palette with elevated cards, readable typography, and smooth micro-interactions.
-- **Quick-Prompt Chips**: Delegated single-event listener pattern ensures instant chip execution without memory leaks or duplicate triggers.
-- **Roving Keyboard Tabindex**: Complete keyboard navigation support across all controls.
-
----
-
-## Project File Layout
-
-| File / Path | Purpose & Responsibility |
+| File / Path | Responsibility |
 |---|---|
-| `manifest.json` | Manifest V3 declaration, permissions, `side_panel`, public `key`, and `update_url`. |
-| `service-worker.js` | Background service worker handling side panel activation and context menus. |
-| `sidepanel/sidepanel.html` | Side panel interface markup (100% CSP compliant, no inline scripts or handlers). |
-| `sidepanel/sidepanel.css` | Design system, container queries (320px–800px), pulsing cursor, rate-limit countdown. |
-| `sidepanel/sidepanel.js` | Side panel UI controller, event delegation, streaming lifecycle, and settings management. |
-| `scripts/page-scanner.js` | In-tab DOM scanner, question extractor, and visual element inventory collector. |
-| `scripts/page-actions.js` | In-tab answer highlighting, form filling, DnD cloze, category sorting, matching cards. |
-| `scripts/page-highlight.css`| Injected host-page styles for highlights, applied badges, and accessibility markers. |
-| `shared/token-optimizer.js` | DOM context pruning, boilerplate stripping, whitespace collapsing, selective screenshots. |
-| `shared/cache-manager.js` | Two-tier query caching (in-memory + `chrome.storage.local`), LRU eviction, 0ms replay. |
-| `shared/gemini-client.js` | Dual provider streaming client (Gemini Interactions + Claude), F15 auto-wait retry logic. |
-| `shared/markdown.js` | Safe DOM-only Markdown renderer (zero `innerHTML`), code block syntax formatting. |
-| `shared/constants.js` | Configuration constants, provider definitions, model defaults, and URL restriction checks. |
-| `shared/frame-helpers.js` | Cross-frame messaging and exercise aggregation helpers for `<iframe>` elements. |
-| `scripts/package-release.mjs`| Zero-dependency CRX3 packaging script and Omaha v2.0 update manifest generator. |
-| `docs/SELF_HOSTED_UPDATES.md`| Comprehensive self-hosted distribution and enterprise GPO deployment manual. |
-| `tests/extension.test.mjs` | 39 unit tests covering manifest, DOM actions, DnD, Gemini/Claude routing, and F15 retry. |
-| `tests/e2e-suite.test.mjs` | 118 E2E tests across 4 Tiers (Feature Coverage, Boundaries, Pairwise, Scenarios). |
-| `tests/fixtures/` | Synthetic fixtures, DOM mocks, and SSE stream generators for automated testing. |
-| `dist/` | Production distribution artifacts (`.crx`, `.zip`, `updates.xml`, `release-metadata.json`). |
+| `manifest.json` | Manifest V3 declaration, permissions, side panel entry point, public key, and update URL |
+| `service-worker.js` | Background service worker managing side panel activation and context menu triggers |
+| `sidepanel/sidepanel.html` | Side panel UI structure (CSP compliant, no inline scripts) |
+| `sidepanel/sidepanel.css` | UI design system, container queries (320px–800px), rate-limit countdown banner |
+| `sidepanel/sidepanel.js` | Side panel controller, event delegation, streaming lifecycle, settings |
+| `scripts/page-scanner.js` | In-tab DOM question extractor, exercise classifier, and visual inventory collector |
+| `scripts/page-actions.js` | In-tab answer highlighting, form filling, DnD cloze, category sorting, matching cards |
+| `scripts/page-highlight.css`| Injected styles for highlights and accessibility markers |
+| `shared/token-optimizer.js` | Boilerplate pruning, whitespace collapsing, selective screenshot decision logic |
+| `shared/cache-manager.js` | Two-tier query cache (in-memory + storage), LRU cap, 0ms replay |
+| `shared/gemini-client.js` | Streaming client for Gemini Interactions and Claude Messages APIs with auto-retry |
+| `shared/markdown.js` | Safe DOM-only Markdown renderer (zero `innerHTML`), code block syntax formatting |
+| `shared/constants.js` | Provider definitions, default models, and restricted URL matchers |
+| `shared/frame-helpers.js` | Cross-frame messaging and exercise aggregation for multi-`<iframe>` pages |
+| `scripts/package-release.mjs`| Zero-dependency CRX3 packaging script and Omaha v2.0 update manifest generator |
+| `docs/SELF_HOSTED_UPDATES.md`| Complete self-hosted Omaha v2.0 release manual and enterprise GPO deployment guide |
+| `tests/extension.test.mjs` | 40 unit tests covering manifest, DOM actions, DnD, routing, and retry logic |
+| `tests/e2e-suite.test.mjs` | 118 E2E tests across 4 testing tiers (Coverage, Boundaries, Pairwise, Scenarios) |
+| `dist/` | Production distribution artifacts (`tab-sleuth.crx`, `tab-sleuth.zip`, `updates.xml`) |
 
----
+### Packaging & Release Pipeline
 
-## Installation & Getting Started
-
-### Option A: Load as Unpacked Extension (Developer Mode)
-
-1. Clone or download this repository to your local machine.
-2. Open Google Chrome (or Microsoft Edge / Brave) and navigate to `chrome://extensions`.
-3. In the upper-right corner, toggle **Developer mode** to **ON**.
-4. Click the **Load unpacked** button in the top-left toolbar.
-5. In the file picker, select the project directory (`tab-qa-extension`).
-6. Click the extension puzzle piece icon in the browser toolbar and pin **TabScan Q&A**.
-7. Click the **TabScan Q&A** toolbar icon to open the Side Panel.
-
-### Option B: 1-Click Bootstrap Installer & Desktop Updater (Recommended for End Users)
-
-> [!TIP]
-> **Zero Configuration Setup**:  
-> No need to manually extract zips or configure paths!
-> 
-> 1. Download [`Install-TabSleuth.bat`](https://github.com/trannguyendev/tabscan-sleuth/releases/latest/download/Install-TabSleuth.bat) from the latest release.
-> 2. Double-click **`Install-TabSleuth.bat`**:
->    - Installs Tab-Sleuth cleanly into `%LOCALAPPDATA%\TabSleuth` (immune to accidental deletion).
->    - Automatically copies the folder path to your clipboard.
->    - Creates an **"Update Tab-Sleuth"** shortcut directly on your Desktop.
->    - Opens Chrome to `chrome://extensions`.
-> 3. In the Chrome tab that opens:
->    - Turn **Developer mode** **ON** (toggle switch in the top-right corner).
->    - Click **Load unpacked** (top-left).
->    - Press `Ctrl+V` to paste the path and hit **Enter / Select Folder**.
-> 
-> 🔄 **How to Update Later**:
-> - Whenever an update is published on GitHub, an **"Update available"** banner will light up inside the extension!
-> - Simply double-click the **"Update Tab-Sleuth"** shortcut on your Desktop, then click the reload (🔄) button in Chrome!
-
-### Configuration & API Keys
-
-1. In the TabScan Q&A Side Panel header, click the **Settings** gear icon.
-2. Choose your **Default Model** (e.g., `gemini-3.8-flash` or `claude-3-5-sonnet-20241022`).
-3. Enter your API Key:
-   - For Gemini: Obtain a free API key from [Google AI Studio](https://aistudio.google.com/).
-   - For Claude: Obtain an API key from the [Anthropic Console](https://console.anthropic.com/).
-4. Click **Test key** to verify connection, then click **Save settings**.
-
----
-
-## Distribution & Packaging Pipeline
-
-TabScan Q&A includes a fully automated, standalone release packaging pipeline built with native Node.js APIs (`node:crypto`, `node:zlib`, `node:fs`).
-
-### Zero-Dependency CRX3 Packaging Script
-
-To produce signed production releases, run:
+To produce signed production releases:
 
 ```bash
-node scripts/package-release.mjs
+node scripts/package-release.mjs --key=key.pem --version=1.0.1
 ```
 
-#### CLI Options
-```text
-Options:
-  --key=<path>          Path to RSA private key PEM (default: key.pem, auto-generated if missing)
-  --out=<dir>           Output directory for release artifacts (default: dist/)
-  --update-url=<url>    URL for remote updates.xml manifest
-  --codebase-url=<url>  Download URL for remote .crx binary
-  --version=<ver>       Version string override (default: manifest.json version)
-  -h, --help            Show help instructions
-```
+Generates:
+- `dist/tab-sleuth.crx`: Cryptographically signed Chromium CRX3 package (RSA-SHA256).
+- `dist/tab-sleuth.zip`: Clean zip package for distribution.
+- `dist/updates.xml`: Omaha v2.0 update manifest specifying App ID and version.
+- `dist/release-metadata.json`: Cryptographic verification hashes and byte sizes.
 
-### Distribution Artifacts
+For enterprise silent rollout via Windows Group Policy (GPO) or Registry, see [docs/SELF_HOSTED_UPDATES.md](docs/SELF_HOSTED_UPDATES.md).
 
-The packaging script outputs four verified production artifacts in `dist/`:
+### Automated Test Suite
 
-| Artifact | Format | Description |
-|---|---|---|
-| `dist/tab-scan-qa.crx` | CRX3 Binary | Signed Chromium extension with `Cr24` magic header, version 3, and RSA-SHA256 signature. |
-| `dist/tab-scan-qa.zip` | ZIP Archive | Clean source bundle excluding developer secrets (`key.pem`), test fixtures, and documentation. |
-| `dist/updates.xml` | Omaha v2.0 XML | Google Update Protocol v2.0 manifest specifying App ID, version, and CRX download URL. |
-| `dist/release-metadata.json` | JSON | Release audit ledger containing SHA-256 hash, byte sizes, and packaged file inventory. |
-
-### Self-Hosted & Enterprise Auto-Updates
-
-Because the extension embeds an `update_url` pointing to `updates.xml`, Chromium browsers automatically poll for updates in the background every 4–5 hours. When a newer version is detected, Chromium silently downloads and installs the updated `.crx` package without requiring the Chrome Web Store.
-
-For detailed enterprise deployment instructions via **Windows Group Policy (GPO / Registry)**, **macOS Configuration Profiles (.plist)**, and **Linux JSON policies**, refer to the full deployment guide:
-
-👉 **[Self-Hosted Auto-Update Pipeline & CRX3 Deployment Guide](docs/SELF_HOSTED_UPDATES.md)**
-
----
-
-## Testing & Quality Assurance
-
-TabScan Q&A is backed by an automated test suite comprising **157 tests** executed with Node.js's built-in test runner (`node:test`). The test suite requires strictly zero third-party testing frameworks.
-
-### 157 Automated Tests
-
-```
-================================================================================
-  TEST SUITE SUMMARY
-================================================================================
-  ✔ Extension Unit Tests (tests/extension.test.mjs)       :  39 passed (0 failed)
-  ✔ 4-Tier E2E Test Suite (tests/e2e-suite.test.mjs)      : 118 passed (0 failed)
---------------------------------------------------------------------------------
-  TOTAL AUTOMATED TEST COVERAGE                           : 157 passed (0 failed)
-================================================================================
-```
-
-### Test Tier Architecture
-
-The test coverage is organized into four rigorous testing tiers adhering to the Category-Partition method, Boundary Value Analysis, and Pairwise interaction testing:
-
-#### Unit Test Suite (`tests/extension.test.mjs` — 39 Tests)
-- MV3 manifest schema validation & PNG icon integrity.
-- Page scanner candidate detection & hidden node suppression.
-- Prompt formatting & multimodal image attachment payload assembly.
-- Safe DOM Markdown rendering & link pseudo-protocol sanitization (`javascript:` blocked).
-- In-page answer highlighting (`CSS.highlights` and `<mark>` fallback).
-- Safe form control auto-filling (radio, checkbox, ARIA controls, select, text).
-- Pointer and HTML5 Drag-and-Drop cloze exercise resolution.
-- Category column sorting and matching card click sequences.
-- Claude & Gemini provider detection, routing, and SSE event streaming.
-- JS syntax balance across all codebase files.
-- **F15 Rate-Limit Auto-Wait**: Verification of `retry-after` header parsing, countdown triggering, and automatic resumption upon quota reset.
-
-#### Tier 1: Feature Coverage (`tests/e2e-suite.test.mjs` — 48 Tests)
-Isolated positive and functional tests across all core capabilities (6 tests each):
-- `1.1 DOM Context Pruning & Compression` (6 tests)
-- `1.2 Multi-Tier Intelligent Query Caching` (6 tests)
-- `1.3 Progressive Response Streaming` (6 tests)
-- `1.4 Manifest Auto-Update & Key Binding` (6 tests)
-- `1.5 Zero-Dependency CRX3 Packaging` (6 tests)
-- `1.6 Omaha v2.0 Update XML Manifest` (6 tests)
-- `1.7 Side-Panel UI States & Responsiveness` (6 tests)
-- `1.8 Micro-Interactions & Visual Feedback` (6 tests)
-
-#### Tier 2: Boundary & Corner Cases (`tests/e2e-suite.test.mjs` — 48 Tests)
-Extreme inputs, edge cases, and fault injection (6 tests each):
-- `2.1 Token Pruner Boundaries` (empty DOM, massive text, zero matches).
-- `2.2 Cache Storage Boundaries` (LRU 150-entry cap, 4MB quota limit, corrupted storage).
-- `2.3 Streaming Boundaries` (malformed SSE, mid-stream abort signals, 0-byte chunks).
-- `2.4 Key Derivation Boundaries` (corrupted PEM keys, short keys, invalid SPKI).
-- `2.5 CRX3 Packaging Boundaries` (corrupted buffers, truncated CRX files).
-- `2.6 Omaha XML Boundaries` (XML entity escaping for `&`, `<`, `>`, `"`, `'`).
-- `2.7 UI State Boundaries` (whitespace queries, 320px narrow container, rapid submissions).
-- `2.8 Micro-Interaction Boundaries` (clipboard rejection, roving tabindex wrap-around).
-
-#### Tier 3: Cross-Feature Combinations (`tests/e2e-suite.test.mjs` — 16 Tests)
-Pairwise combinatorial interactions between subsystems:
-- Pruned DOM + Multi-tier caching consistency.
-- Progressive streaming + storage persistence + 0ms instant cache replay.
-- CRX3 packaging + App ID derivation + `manifest.json` key alignment.
-- Streaming abort + cache invalidation safety.
-- Container query resizing + clipboard copy interactions.
-- Release metadata SHA-256 cryptographic verification.
-
-#### Tier 4: Real-World Scenarios (`tests/e2e-suite.test.mjs` — 6 Tests)
-Comprehensive end-to-end user workflows:
-1. **Wikipedia Article Q&A**: Large article context pruning, progressive streaming, and instant 0ms cached replay.
-2. **Dynamic SPA**: Modern web app with sticky navigation, cookie banners, and dynamic chrome pruning.
-3. **Full Packaging Pipeline**: End-to-end build producing signed CRX3, Omaha XML, and cryptographic verification.
-4. **Narrow Container Responsiveness**: Verifying side panel layout and interactions at 320px width.
-5. **Network Interruption Recovery**: Simulating network failure during streaming with graceful retry recovery.
-6. **Multimodal Diagram Query**: Verifying selective screenshot attachment for diagram and canvas queries.
-
-### Running the Test Suites
-
-To execute the test suites on any machine with Node.js (v18+ recommended):
+Tab-Sleuth includes **158 automated tests** executed using Node.js's native test runner (`node:test`) with zero external test dependencies:
 
 ```bash
-# 1. Run unit test suite (39 tests)
+# Run unit tests (40 tests)
 node --test tests/extension.test.mjs
 
-# 2. Run E2E test suite across all 4 tiers (118 tests)
+# Run E2E test suite (118 tests across 4 tiers)
 node --test tests/e2e-suite.test.mjs
 
-# 3. Run the complete test suite (all 157 tests)
+# Run all 158 tests
 node --test tests/extension.test.mjs tests/e2e-suite.test.mjs
 ```
 
----
-
-## Security & Compliance
-
-- **No Remote Code Execution**: Strictly adheres to Chrome Manifest V3 Content Security Policy (CSP). Contains no `eval()`, `Function()`, or external CDN script tags.
-- **XSS-Safe Markdown**: `shared/markdown.js` explicitly blocks `javascript:`, `vbscript:`, and `data:` pseudo-protocols on links, and creates DOM nodes without `innerHTML`.
-- **Form Safety Guarantee**: `scripts/page-actions.js` is programmed to never click `type="submit"` buttons or trigger `.submit()` on forms.
-- **Protected Cryptographic Key**: The private signing key (`key.pem`) is excluded from `.gitignore`, packaged ZIP archives, and git commits.
-- **Restricted URL Protection**: Automatically detects and gracefully disables scanning on restricted browser pages (`chrome://`, `edge://`, `about:`, and the Chrome Web Store). Local `file://` scanning requires user-granted permission in extension details.
+</details>
 
 ---
 
-## License
+## 📄 License
 
-MIT License. Designed and engineered for high-performance browser extension workflows.
+MIT License. Designed and engineered for high-performance, private, and accessible browser extension workflows.

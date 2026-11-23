@@ -3,9 +3,9 @@ setlocal enabledelayedexpansion
 title Tab-Sleuth - 1-Click Updater
 
 set INSTALL_DIR=%LOCALAPPDATA%\TabSleuth
-set ZIP_URL=https://github.com/trannguyendev/tabscan-sleuth/releases/latest/download/tab-scan-qa.zip
+set ZIP_URL=https://github.com/trannguyendev/tabscan-sleuth/releases/latest/download/tab-sleuth.zip
 set API_URL=https://api.github.com/repos/trannguyendev/tabscan-sleuth/releases/latest
-set TEMP_ZIP=%TEMP%\tab-scan-qa-update.zip
+set TEMP_ZIP=%TEMP%\tab-sleuth-update.zip
 
 cls
 echo ==============================================================================
