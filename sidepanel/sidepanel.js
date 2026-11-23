@@ -29,7 +29,7 @@ import {
   getQueryCache,
   setQueryCache,
 } from '../shared/cache-manager.js';
-import { checkGitHubRelease } from '../shared/update-checker.js';
+import { checkGitHubRelease, isNewerVersion } from '../shared/update-checker.js';
 
 const el = {
   autoScanToggle: document.getElementById('auto-scan-toggle'),
@@ -2721,6 +2721,27 @@ function wireEventListeners() {
   }
 }
 
+function renderUpdateBanner(info) {
+  if (!el.updateBanner) return;
+  el.updateBannerText.textContent = `New version available (${info.latestVersion})!`;
+  el.updateBanner.hidden = false;
+
+  if (el.updateVersionLabel) {
+    el.updateVersionLabel.textContent = `${info.latestVersion} Ready`;
+  }
+  if (el.viewReleaseLink && info.releaseUrl) {
+    el.viewReleaseLink.href = info.releaseUrl;
+  }
+  if (el.downloadUpdaterLink && info.updaterBatUrl) {
+    el.downloadUpdaterLink.href = info.updaterBatUrl;
+  }
+
+  // Clear badge now that user has opened the side panel
+  if (chrome.action?.setBadgeText) {
+    chrome.action.setBadgeText({ text: '' }).catch(() => {});
+  }
+}
+
 async function checkExtensionUpdates() {
   try {
     const manifest = chrome.runtime?.getManifest ? chrome.runtime.getManifest() : { version: '1.0.1' };
@@ -2730,24 +2751,21 @@ async function checkExtensionUpdates() {
       set: (obj) => chrome.storage.local.set(obj),
     } : null;
 
+    if (storage) {
+      const cached = await storage.get(['tabscan_update_info']);
+      const info = cached?.tabscan_update_info;
+      if (info?.latestVersion && isNewerVersion(info.latestVersion, currentVersion)) {
+        renderUpdateBanner(info);
+      }
+    }
+
     const result = await checkGitHubRelease({
       currentVersion,
       storage,
     });
 
-    if (result?.hasUpdate && el.updateBanner) {
-      el.updateBannerText.textContent = `New version available (${result.latestVersion})!`;
-      el.updateBanner.hidden = false;
-
-      if (el.updateVersionLabel) {
-        el.updateVersionLabel.textContent = `${result.latestVersion} Ready`;
-      }
-      if (el.viewReleaseLink && result.releaseUrl) {
-        el.viewReleaseLink.href = result.releaseUrl;
-      }
-      if (el.downloadUpdaterLink && result.updaterBatUrl) {
-        el.downloadUpdaterLink.href = result.updaterBatUrl;
-      }
+    if (result?.hasUpdate) {
+      renderUpdateBanner(result);
     }
   } catch (err) {
     console.debug('Update check skipped:', err);

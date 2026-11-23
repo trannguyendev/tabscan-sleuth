@@ -1,4 +1,5 @@
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from './shared/constants.js';
+import { checkGitHubRelease } from './shared/update-checker.js';
 
 const MENU_ASK_SELECTION = 'tabscan-ask-selection';
 const MENU_SCAN_PAGE = 'tabscan-scan-page';
@@ -31,8 +32,52 @@ function registerContextMenus() {
   });
 }
 
+/**
+ * Checks for extension updates on Chrome startup (strictly once per browser session).
+ */
+export async function checkStartupUpdate() {
+  try {
+    const sessionData = await chrome.storage.session.get('checked_startup_update');
+    if (sessionData?.checked_startup_update) {
+      return; // Already checked during this Chrome startup session
+    }
+    await chrome.storage.session.set({ checked_startup_update: true });
+
+    const manifest = chrome.runtime?.getManifest ? chrome.runtime.getManifest() : { version: '1.0.1' };
+    const currentVersion = manifest?.version || '1.0.1';
+
+    const result = await checkGitHubRelease({
+      currentVersion,
+      force: true, // Force live check on browser start
+    });
+
+    if (result?.hasUpdate) {
+      await chrome.storage.local.set({
+        tabscan_update_info: result,
+        tabscan_last_update_check: Date.now(),
+      });
+      if (chrome.action?.setBadgeText) {
+        await chrome.action.setBadgeText({ text: 'NEW' });
+        await chrome.action.setBadgeBackgroundColor({ color: '#f59e0b' });
+      }
+    } else {
+      if (chrome.action?.setBadgeText) {
+        await chrome.action.setBadgeText({ text: '' });
+      }
+    }
+  } catch (err) {
+    console.debug('Startup update check skipped or failed:', err);
+  }
+}
+
+// Trigger once per Chrome startup session
+chrome.runtime.onStartup.addListener(() => {
+  checkStartupUpdate();
+});
+
 chrome.runtime.onInstalled.addListener(async () => {
   registerContextMenus();
+  checkStartupUpdate();
 
   try {
     const existing = await chrome.storage.local.get(STORAGE_KEYS.SETTINGS);

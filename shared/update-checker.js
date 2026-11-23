@@ -52,7 +52,11 @@ export async function checkGitHubRelease(options = {}) {
       const lastCheck = cached.tabscan_last_update_check || 0;
       const now = Date.now();
       if (now - lastCheck < CHECK_INTERVAL_MS && cached.tabscan_update_info) {
-        return cached.tabscan_update_info;
+        const remoteTag = cached.tabscan_update_info.latestVersion || '';
+        return {
+          ...cached.tabscan_update_info,
+          hasUpdate: isNewerVersion(remoteTag, currentVersion),
+        };
       }
     } catch {
       // Fall through to live check
