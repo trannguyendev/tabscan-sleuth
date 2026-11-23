@@ -29,7 +29,7 @@ import {
   getQueryCache,
   setQueryCache,
 } from '../shared/cache-manager.js';
-import { checkGitHubRelease, isNewerVersion } from '../shared/update-checker.js';
+import { checkGitHubRelease, isNewerVersion, downloadUpdateScript } from '../shared/update-checker.js';
 
 const el = {
   autoScanToggle: document.getElementById('auto-scan-toggle'),
@@ -115,6 +115,7 @@ const el = {
   updateModalClose: document.getElementById('update-modal-close'),
   updateVersionLabel: document.getElementById('update-version-label'),
   downloadUpdaterLink: document.getElementById('download-updater-link'),
+  downloadUpdaterText: document.getElementById('download-updater-text'),
   viewReleaseLink: document.getElementById('view-release-link'),
   openExtensionsLink: document.getElementById('open-extensions-link'),
   activeVersionIndicator: document.getElementById('active-version-indicator'),
@@ -2697,6 +2698,9 @@ function wireEventListeners() {
     el.updateBannerBtn.addEventListener('click', () => {
       if (typeof el.updateModal?.showModal === 'function') {
         el.updateModal.showModal();
+        if (el.downloadUpdaterLink && typeof el.downloadUpdaterLink.focus === 'function') {
+          el.downloadUpdaterLink.focus();
+        }
       }
     });
   }
@@ -2715,10 +2719,86 @@ function wireEventListeners() {
     });
   }
 
-  if (el.openExtensionsLink) {
-    el.openExtensionsLink.addEventListener('click', () => {
-      chrome.tabs.create({ url: 'chrome://extensions' });
+  if (!('closedBy' in HTMLDialogElement.prototype) && el.updateModal) {
+    el.updateModal.addEventListener('click', (event) => {
+      if (event.target === el.updateModal && typeof el.updateModal.close === 'function') {
+        el.updateModal.close();
+      }
     });
+  }
+
+  if (el.downloadUpdaterLink) {
+    el.downloadUpdaterLink.addEventListener('click', handleDownloadUpdater);
+  }
+
+  if (el.openExtensionsLink) {
+    el.openExtensionsLink.addEventListener('click', (e) => {
+      e?.preventDefault?.();
+      if (typeof chrome !== 'undefined' && chrome.tabs?.create) {
+        chrome.tabs.create({ url: 'chrome://extensions' });
+      } else if (typeof window !== 'undefined' && window.open) {
+        window.open('chrome://extensions', '_blank');
+      }
+    });
+  }
+}
+
+async function handleDownloadUpdater(event) {
+  if (event) {
+    event.preventDefault();
+    if (typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
+  }
+
+  const link = el.downloadUpdaterLink;
+  if (!link || link.dataset.downloading === 'true') {
+    return;
+  }
+
+  link.dataset.downloading = 'true';
+  link.setAttribute('aria-busy', 'true');
+
+  const textEl = el.downloadUpdaterText || document.getElementById('download-updater-text') || link;
+  const originalText = textEl ? textEl.textContent : 'Download update.bat';
+  if (textEl) {
+    textEl.textContent = 'Downloading…';
+  }
+
+  const targetUrl = link.href || link.getAttribute('href') || 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat';
+
+  try {
+    const result = await downloadUpdateScript({
+      url: targetUrl,
+      filename: 'update.bat',
+      chromeTabs: typeof chrome !== 'undefined' ? chrome.tabs : undefined,
+    });
+
+    if (result.success) {
+      if (result.method === 'blob') {
+        if (textEl) textEl.textContent = 'Downloaded! ✓';
+        announce('update.bat downloaded. Run it from your Downloads folder to update.');
+      } else {
+        if (textEl) textEl.textContent = 'Opened in tab ↗';
+        announce('Update script opened in a new tab.');
+      }
+    } else {
+      console.debug('Updater download unsuccessful:', result.error);
+      if (textEl) textEl.textContent = 'Download failed';
+      announce('Could not download update script. Please check your internet connection.');
+    }
+  } catch (err) {
+    console.debug('Updater download encountered an error:', err);
+    if (textEl) textEl.textContent = 'Download failed';
+    announce('Could not download update script.');
+  } finally {
+    setTimeout(() => {
+      if (textEl && originalText) {
+        textEl.textContent = originalText;
+      }
+      delete link.dataset.downloading;
+      link.removeAttribute('aria-busy');
+    }, 2500);
   }
 }
 

@@ -57,6 +57,7 @@ import {
 } from '../scripts/package-release.mjs';
 
 import { renderMarkdown } from '../shared/markdown.js';
+import { downloadUpdateScript } from '../shared/update-checker.js';
 
 // Test fixtures & DOM harness
 import {
@@ -878,6 +879,97 @@ describe('Tier 1 — Feature Coverage', () => {
       assert.strictEqual(activeIndex, 0);
       assert.strictEqual(btn1.focused, true);
     });
+
+    it('T1_F8_07: clicking download updater link initiates blob download without cross-origin navigation', async () => {
+      const { document: doc } = createSyntheticDom();
+      const downloadLink = doc.createElement('a', {
+        id: 'download-updater-link',
+        href: 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat',
+        download: 'update.bat',
+      });
+      const textSpan = doc.createElement('span', { id: 'download-updater-text' });
+      textSpan.textContent = 'Download update.bat';
+      downloadLink.appendChild(textSpan);
+      doc.body.appendChild(downloadLink);
+
+      const mockFetch = async () => ({
+        ok: true,
+        text: async () => '@echo off\r\necho update\r\n',
+      });
+      const mockCreateObjectURL = () => 'blob:chrome-extension://sleuth/123';
+
+      let defaultPrevented = false;
+      let downloadInitiated = false;
+
+      downloadLink.addEventListener('click', async (evt) => {
+        evt.preventDefault();
+        defaultPrevented = evt.defaultPrevented;
+        textSpan.textContent = 'Downloading…';
+        const res = await downloadUpdateScript({
+          url: downloadLink.href,
+          filename: 'update.bat',
+          fetchFn: mockFetch,
+          createObjectURL: mockCreateObjectURL,
+          documentObj: doc,
+        });
+        if (res.success && res.method === 'blob') {
+          downloadInitiated = true;
+          textSpan.textContent = 'Downloaded! ✓';
+        }
+      });
+
+      downloadLink.click();
+      await new Promise((r) => setTimeout(r, 10));
+
+      assert.strictEqual(defaultPrevented, true, 'Default top-level navigation must be prevented');
+      assert.strictEqual(downloadInitiated, true, 'Blob download must be initiated');
+      assert.strictEqual(textSpan.textContent, 'Downloaded! ✓');
+    });
+
+    it('T1_F8_08: clicking download updater link gracefully falls back to chrome.tabs.create on network error', async () => {
+      const { document: doc } = createSyntheticDom();
+      const downloadLink = doc.createElement('a', {
+        id: 'download-updater-link',
+        href: 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat',
+      });
+      const textSpan = doc.createElement('span', { id: 'download-updater-text' });
+      textSpan.textContent = 'Download update.bat';
+      downloadLink.appendChild(textSpan);
+      doc.body.appendChild(downloadLink);
+
+      const failingFetch = async () => {
+        throw new Error('Network error: Failed to fetch');
+      };
+
+      let createdTabUrl = '';
+      const mockChromeTabs = {
+        create: async ({ url }) => {
+          createdTabUrl = url;
+          return { id: 101 };
+        },
+      };
+
+      downloadLink.addEventListener('click', async (evt) => {
+        evt.preventDefault();
+        textSpan.textContent = 'Downloading…';
+        const res = await downloadUpdateScript({
+          url: downloadLink.href,
+          filename: 'update.bat',
+          fetchFn: failingFetch,
+          chromeTabs: mockChromeTabs,
+          documentObj: doc,
+        });
+        if (res.success && res.method === 'tab') {
+          textSpan.textContent = 'Opened in tab ↗';
+        }
+      });
+
+      downloadLink.click();
+      await new Promise((r) => setTimeout(r, 10));
+
+      assert.strictEqual(createdTabUrl, downloadLink.href);
+      assert.strictEqual(textSpan.textContent, 'Opened in tab ↗');
+    });
   });
 });
 
@@ -1579,6 +1671,75 @@ describe('Tier 2 — Boundary & Corner Cases', () => {
       assert.strictEqual(list.children.length, 2);
       assert.strictEqual(list.children[0].textContent, 'Valid question 1');
       assert.strictEqual(list.children[1].textContent, 'Valid question 2');
+    });
+
+    it('T2_F8_07: rapid repeated clicks on download updater are debounced while download is in-flight', async () => {
+      const { document: doc } = createSyntheticDom();
+      const link = doc.createElement('a', { id: 'download-updater-link' });
+      doc.body.appendChild(link);
+
+      let fetchCount = 0;
+      const delayedFetch = async () => {
+        fetchCount++;
+        await new Promise((r) => setTimeout(r, 20));
+        return { ok: true, text: async () => '@echo off' };
+      };
+
+      async function handleClick(e) {
+        e.preventDefault();
+        if (link.dataset.downloading === 'true') return;
+        link.dataset.downloading = 'true';
+        link.setAttribute('aria-busy', 'true');
+        await downloadUpdateScript({
+          fetchFn: delayedFetch,
+          documentObj: doc,
+          createObjectURL: () => 'blob:abc',
+        });
+        delete link.dataset.downloading;
+        link.removeAttribute('aria-busy');
+      }
+
+      link.addEventListener('click', handleClick);
+
+      // Trigger 3 rapid clicks
+      link.click();
+      link.click();
+      link.click();
+
+      await new Promise((r) => setTimeout(r, 50));
+      assert.strictEqual(fetchCount, 1, 'Only one fetch should be fired during in-flight download');
+    });
+
+    it('T2_F8_08: update modal closes on close button click and outside backdrop click', () => {
+      const { document: doc } = createSyntheticDom();
+      const modal = doc.createElement('dialog', { id: 'update-modal' });
+      const closeBtn = doc.createElement('button', { id: 'update-modal-close' });
+      modal.appendChild(closeBtn);
+      doc.body.appendChild(modal);
+
+      modal.showModal();
+      assert.strictEqual(modal.open, true);
+
+      // Close via close button
+      closeBtn.addEventListener('click', () => {
+        modal.close();
+      });
+      closeBtn.click();
+      assert.strictEqual(modal.open, false);
+
+      // Reopen and test backdrop click
+      modal.showModal();
+      assert.strictEqual(modal.open, true);
+
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.close();
+        }
+      });
+
+      // Click on backdrop (target === modal)
+      modal.click();
+      assert.strictEqual(modal.open, false);
     });
   });
 });

@@ -2955,5 +2955,246 @@ test('update-checker parses semver and detects newer versions correctly', async 
   assert.ok(result.updaterBatUrl.includes('update.bat'));
 });
 
+test('downloadUpdateScript initiates blob download with same-origin URL and triggers anchor click', async () => {
+  const { downloadUpdateScript } = await import('../shared/update-checker.js');
+
+  const batScriptContent = '@echo off\r\necho Updating Tab-Sleuth...\r\n';
+  const mockFetch = async () => ({
+    ok: true,
+    text: async () => batScriptContent,
+  });
+
+  let createdUrl = '';
+  const mockCreateObjectURL = (blob) => {
+    createdUrl = 'blob:chrome-extension://dummy-id/12345';
+    return createdUrl;
+  };
+  const mockRevokeObjectURL = () => {};
+
+  let clicked = false;
+  let appendedChild = null;
+  const mockAnchor = {
+    href: '',
+    download: '',
+    style: {},
+    click() {
+      clicked = true;
+    },
+    remove() {},
+  };
+
+  const mockDoc = {
+    createElement(tag) {
+      if (tag === 'a') return mockAnchor;
+      return {};
+    },
+    body: {
+      appendChild(node) {
+        appendedChild = node;
+      },
+      removeChild() {},
+    },
+  };
+
+  const result = await downloadUpdateScript({
+    url: 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat',
+    filename: 'update.bat',
+    fetchFn: mockFetch,
+    createObjectURL: mockCreateObjectURL,
+    revokeObjectURL: mockRevokeObjectURL,
+    documentObj: mockDoc,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.method, 'blob');
+  assert.equal(mockAnchor.download, 'update.bat');
+  assert.equal(mockAnchor.href, createdUrl);
+  assert.equal(clicked, true);
+  assert.equal(appendedChild, mockAnchor);
+});
+
+test('downloadUpdateScript gracefully falls back to chrome.tabs.create when fetch fails', async () => {
+  const { downloadUpdateScript } = await import('../shared/update-checker.js');
+
+  const failingFetch = async () => ({
+    ok: false,
+    status: 404,
+  });
+
+  let openedUrl = '';
+  const mockChromeTabs = {
+    create: async ({ url }) => {
+      openedUrl = url;
+      return { id: 99 };
+    },
+  };
+
+  const targetUrl = 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat';
+  const result = await downloadUpdateScript({
+    url: targetUrl,
+    filename: 'update.bat',
+    fetchFn: failingFetch,
+    chromeTabs: mockChromeTabs,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.method, 'tab');
+  assert.equal(openedUrl, targetUrl);
+  assert.ok(result.fallbackReason.includes('404'));
+});
+
+test('downloadUpdateScript falls back to window.open when chrome.tabs is unavailable and fetch fails', async () => {
+  const { downloadUpdateScript } = await import('../shared/update-checker.js');
+
+  const throwingFetch = async () => {
+    throw new Error('Network offline');
+  };
+
+  let openedTarget = '';
+  let openedWindowUrl = '';
+  const mockWindow = {
+    open: (url, target) => {
+      openedWindowUrl = url;
+      openedTarget = target;
+    },
+  };
+
+  const targetUrl = 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat';
+  const result = await downloadUpdateScript({
+    url: targetUrl,
+    filename: 'update.bat',
+    fetchFn: throwingFetch,
+    chromeTabs: null,
+    windowObj: mockWindow,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.method, 'window');
+  assert.equal(openedWindowUrl, targetUrl);
+  assert.equal(openedTarget, '_blank');
+});
+
+test('downloadUpdateScript rejects unsafe URL schemes without making network requests or opening tabs', async () => {
+  const { downloadUpdateScript } = await import('../shared/update-checker.js');
+
+  let fetchCalled = false;
+  let tabCreated = false;
+
+  const result = await downloadUpdateScript({
+    url: 'javascript:alert(document.cookie)',
+    fetchFn: async () => {
+      fetchCalled = true;
+      return { ok: true, text: async () => 'echo evil' };
+    },
+    chromeTabs: {
+      create: async () => {
+        tabCreated = true;
+      },
+    },
+  });
+
+  assert.equal(result.success, false);
+  assert.equal(result.method, 'failed');
+  assert.match(result.error, /must be an HTTP or HTTPS URL/i);
+  assert.equal(fetchCalled, false);
+  assert.equal(tabCreated, false);
+});
+
+test('downloadUpdateScript normalizes batch script line endings to CRLF and sanitizes filename', async () => {
+  const { downloadUpdateScript } = await import('../shared/update-checker.js');
+
+  let passedBlob = null;
+  const mockCreateObjectURL = (blob) => {
+    passedBlob = blob;
+    return 'blob:chrome-extension://test/blob-id';
+  };
+
+  const mockAnchor = {
+    href: '',
+    download: '',
+    style: {},
+    click() {},
+    remove() {},
+  };
+
+  const mockDoc = {
+    createElement(tag) {
+      if (tag === 'a') return mockAnchor;
+      return {};
+    },
+    body: {
+      appendChild() {},
+      removeChild() {},
+    },
+  };
+
+  const lfScript = '@echo off\necho Line 1\necho Line 2\n';
+  const result = await downloadUpdateScript({
+    url: 'https://raw.githubusercontent.com/trannguyendev/tabscan-sleuth/main/update.bat',
+    filename: '../../malicious/update.bat',
+    fetchFn: async () => ({
+      ok: true,
+      text: async () => lfScript,
+    }),
+    createObjectURL: mockCreateObjectURL,
+    revokeObjectURL: () => {},
+    documentObj: mockDoc,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.method, 'blob');
+  assert.equal(mockAnchor.download, 'update.bat', 'Filename path traversal must be stripped to basename');
+
+  // Verify blob content has CRLF line endings
+  assert.ok(passedBlob instanceof Blob);
+  const blobText = await passedBlob.text();
+  assert.ok(blobText.includes('\r\necho Line 1\r\necho Line 2\r\n'));
+  assert.ok(!blobText.includes('Line 1\n'));
+});
+
+test('downloadUpdateScript falls back to default URL when empty or whitespace URL is provided', async () => {
+  const { downloadUpdateScript } = await import('../shared/update-checker.js');
+
+  let fetchedUrl = '';
+  const result = await downloadUpdateScript({
+    url: '   ',
+    fetchFn: async (reqUrl) => {
+      fetchedUrl = reqUrl;
+      return {
+        ok: true,
+        text: async () => '@echo off\r\n',
+      };
+    },
+    createObjectURL: () => 'blob:test',
+    revokeObjectURL: () => {},
+    documentObj: {
+      createElement: () => ({ style: {}, click() {}, remove() {} }),
+      body: { appendChild() {}, removeChild() {} },
+    },
+  });
+
+  assert.equal(result.success, true);
+  assert.ok(fetchedUrl.startsWith('https://raw.githubusercontent.com/'));
+  assert.ok(fetchedUrl.endsWith('/update.bat'));
+});
+
+test('sidepanel.html update modal markup conforms to accessible MV3 and download safety standards', async () => {
+  const html = await fs.readFile(path.join(ROOT_DIR, 'sidepanel', 'sidepanel.html'), 'utf8');
+
+  // Verify download link attributes prevent top-frame navigation
+  assert.match(html, /id="download-updater-link"[^>]*target="_blank"/i);
+  assert.match(html, /id="download-updater-link"[^>]*rel="noopener noreferrer"/i);
+  assert.match(html, /id="download-updater-link"[^>]*download="update\.bat"/i);
+
+  // Verify update modal dialog accessibility
+  assert.match(html, /id="update-modal"[^>]*aria-labelledby="update-modal-title"/i);
+  assert.match(html, /id="update-modal-title"/i);
+  assert.match(html, /id="update-modal-close"[^>]*aria-label="Close update dialog"/i);
+  assert.match(html, /id="update-version-label"/i);
+  assert.match(html, /id="open-extensions-link"/i);
+  assert.match(html, /id="view-release-link"/i);
+});
+
+
 
 

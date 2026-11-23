@@ -273,6 +273,24 @@ export class MiniElement extends MiniNode {
     this.attrs.type = String(val);
   }
 
+  get href() {
+    return this.attrs.href || this._href || '';
+  }
+
+  set href(val) {
+    this._href = String(val);
+    this.attrs.href = String(val);
+  }
+
+  get download() {
+    return this.attrs.download || this._download || '';
+  }
+
+  set download(val) {
+    this._download = String(val);
+    this.attrs.download = String(val);
+  }
+
   get className() {
     return this.attrs.class || '';
   }
