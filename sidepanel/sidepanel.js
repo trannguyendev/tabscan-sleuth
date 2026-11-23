@@ -2880,8 +2880,31 @@ function initVersionIndicator() {
   const version = chrome.runtime?.getManifest?.()?.version || '1.0.3';
   if (el.activeVersionIndicator) {
     el.activeVersionIndicator.textContent = `v${version.replace(/^v/, '')}`;
-    el.activeVersionIndicator.title = `Tab-Sleuth v${version.replace(/^v/, '')}`;
+    el.activeVersionIndicator.title = `Tab-Sleuth v${version.replace(/^v/, '')} (Click to open update dialog)`;
     el.activeVersionIndicator.dataset.version = version;
+    el.activeVersionIndicator.style.cursor = 'pointer';
+    el.activeVersionIndicator.setAttribute('role', 'button');
+    el.activeVersionIndicator.setAttribute('tabindex', '0');
+    el.activeVersionIndicator.setAttribute('aria-label', `Tab-Sleuth version ${version}. Click to open update dialog.`);
+
+    const triggerModal = () => {
+      if (el.updateModal && typeof el.updateModal.showModal === 'function') {
+        if (!el.updateModal.open) {
+          el.updateModal.showModal();
+        }
+        if (el.downloadUpdaterLink) {
+          el.downloadUpdaterLink.focus();
+        }
+      }
+    };
+
+    el.activeVersionIndicator.addEventListener('click', triggerModal);
+    el.activeVersionIndicator.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        triggerModal();
+      }
+    });
   }
 }
 
